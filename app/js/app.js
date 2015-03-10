@@ -15,13 +15,17 @@ angular.module('myApp', [
 config(['$routeProvider',
 	function($routeProvider) {
 		$routeProvider.
-			when('/view1', {
+		when('/view1', {
 			templateUrl: '/partials/partial1.html',
 			controller: 'MyCtrl1'
 		}).
 		when('/view2/:tab', {
 			templateUrl: '/partials/partial2.html',
 			controller: 'MyCtrl2'
+		}).
+		when('/googleOAuth', {
+			templateUrl: '/partials/googleOAuth.html',
+			controller: 'MyCtrl3'
 		}).
 		otherwise({
 			redirectTo: '/'

@@ -34,7 +34,7 @@ angular.module('myApp.controllers', []).
     }
   ]).
   controller('MyCtrl2', ['$scope', '$routeParams',
-      function($scope, $routeParams) {
+    function($scope, $routeParams) {
         var tab = $routeParams.tab;
         var tables = ['StarAccount', 'User', 'SendEmailLog', 'OnLineLog'];
         var URL = 'https://docs.google.com/spreadsheets/d/13M4ACBGWNQ8-iG5qbwirJF9uTGhaiuvBXhbK34qjNoM/gviz/tq?sheet=' + tab;
@@ -65,7 +65,7 @@ angular.module('myApp.controllers', []).
             var len = jsonData.rows.length;
 
             console.log(jsonData);
-//debugger;;
+        //debugger;;
             /*for (var i = 0; i < len; ++i) {
                 var row = jsonData.rows[i];
                 for (var j = 0; j < row.c.length; ++j) {
@@ -73,5 +73,9 @@ angular.module('myApp.controllers', []).
                 }
             }*/
         }
-      }
+    }
+  ]).controller('MyCtrl3', ['$scope', '$routeParams',
+    function($scope, $routeParams) {
+
+    }
   ]);
