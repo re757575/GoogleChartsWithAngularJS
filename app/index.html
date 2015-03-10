@@ -7,7 +7,6 @@
 </head>
 <body>
 
-	<script src="bower_components/jquery/dist/jquery.min.js"></script>
 	<script src="bower_components/angular/angular.js"></script>
 	<script src="bower_components/angular-route/angular-route.js"></script>
 	<script src="js/app.js"></script>
@@ -24,91 +23,8 @@
 		<li><a href="#/view2/OnLineLog">OnLineLog</a></li>
 		<li><a href="#/googleOAuth/">googleOAuth</a></li>
 	</ul>
-	<button id="authButton">google OAuth2.0</button>
+
 	<div ng-view></div>
 
-  <script>
-
-    // Google Console 專案名稱: Google JavaScript API Test
-    var OAuthModel = true;
-    var client_id = '530939257520-6mku54g807m56qqvirhc3qieqdnm9rrb.apps.googleusercontent.com',
-    scopes = [
-		'https://www.googleapis.com/auth/userinfo.email',
-		'https://www.googleapis.com/auth/spreadsheets',
-		'https://www.googleapis.com/auth/drive.file',
-		'https://www.googleapis.com/auth/drive',
-		'https://spreadsheets.google.com/feeds',
-        ],
-    // 本地使用OAuth要設定 hostsName => C:\Windows\System32\drivers\etc\hosts
-    // 127.0.0.1       alex.dai.io
-    redirect_uri = "http://alex.dai.io:3000",
-    oauthToken;
-
-
-	var authButton = document.getElementById('authButton');
-	authButton.style.display = 'none';
-
-    var onAuthApiLoad = function() {
-        gapi.auth.authorize(
-            {
-              'client_id' : client_id,
-              //'redirect_uri' : redirect_uri,  // 不需要設定, 而是要在google console 設定JAVASCRIPT 來源
-              'scope' : scopes,
-              'immediate' : OAuthModel
-            },
-            handleAuthResult
-        );
-    };
-
-    var handleAuthResult = function(authResult) {
-
-      if (authResult && !authResult.error) {
-        oauthToken = authResult.access_token;
-        loadUserInfo();
-        loadSpreadSheets();
-
-      } else {
-            // 未授權過,則跳出授權視窗
-            authButton.style.display = 'block';
-            authButton.onclick = function() {
-	            if ('immediate_failed' === authResult.error) {
-	                OAuthModel = false;
-	                onApiLoad();
-	            } else {
-	                console.log('非預期錯誤: ' + authResult.error);
-	            }
-            };
-      }
-      console.log(gapi.auth.getToken());
-    };
-
-	function loadUserInfo() {
-		gapi.client.load('oauth2', 'v2', function() {
-			var request = gapi.client.oauth2.userinfo.get();
-				request.execute(getUserInfoCallback);
-		});
-	}
-
-	function getUserInfoCallback(obj) {
-		console.log(obj);
-	}
-
-	function loadSpreadSheets() {
-		var sheetkey = '13M4ACBGWNQ8-iG5qbwirJF9uTGhaiuvBXhbK34qjNoM';
-		var url = 'https://spreadsheets.google.com/feeds/list/' + sheetkey + '/2/private/full?alt=json&access_token=' + oauthToken;
-		console.log(url);
-		$.get(url, function(data) {
-			console.log(data.feed.entry);
-		});
-	}
-
-    function onApiLoad() {
-      window.gapiAuthLoaded = true;
-      //set the following up to avoid pop ups
-      gapi.load('auth',{'callback' : onAuthApiLoad });
-    }
-
-    </script>
-    <script src="https://apis.google.com/js/client.js?onload=onApiLoad"></script>
 </body>
 </html>

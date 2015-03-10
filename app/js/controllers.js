@@ -74,8 +74,96 @@ angular.module('myApp.controllers', []).
             }*/
         }
     }
-  ]).controller('MyCtrl3', ['$scope', '$routeParams',
-    function($scope, $routeParams) {
+  ]).controller('MyCtrl3', ['$scope', '$routeParams', '$http',
+    function($scope, $routeParams, $http) {
 
+        // Google Console 專案名稱: RC-JSON-Data
+        var OAuthModel = true;
+        var client_id = '530939257520-6mku54g807m56qqvirhc3qieqdnm9rrb.apps.googleusercontent.com',
+        scopes = [
+            'https://www.googleapis.com/auth/userinfo.email',
+            'https://www.googleapis.com/auth/spreadsheets',
+            'https://www.googleapis.com/auth/drive.file',
+            'https://www.googleapis.com/auth/drive',
+            'https://spreadsheets.google.com/feeds',
+            ],
+        // 本地使用OAuth要設定 hostsName => C:\Windows\System32\drivers\etc\hosts
+        // 127.0.0.1       alex.dai.io
+        // 代理伺服器要關閉
+        redirect_uri = "http://alex.dai.io:3000",
+        oauthToken;
+
+        var authButton = document.getElementById('authButton');
+        authButton.style.display = 'none';
+
+        var onAuthApiLoad = function() {
+            gapi.auth.authorize(
+                {
+                  'client_id' : client_id,
+                  //'redirect_uri' : redirect_uri,  // 不需要設定, 而是要在google console 設定JAVASCRIPT 來源
+                  'scope' : scopes,
+                  'immediate' : OAuthModel
+                },
+                handleAuthResult
+            );
+        };
+
+        var handleAuthResult = function(authResult) {
+
+          if (authResult && !authResult.error) {
+            oauthToken = authResult.access_token;
+            loadUserInfo();
+            loadSpreadSheets();
+
+          } else {
+                // 未授權過,則顯示按鈕
+                authButton.style.display = 'block';
+                authButton.onclick = function() {
+                    if ('immediate_failed' === authResult.error) {
+                        OAuthModel = false; // 跳出授權視窗
+                        onApiLoad();
+                    } else {
+                        console.log('非預期錯誤: ' + authResult.error);
+                    }
+                };
+          }
+          console.log(gapi.auth.getToken());
+        };
+
+        function loadUserInfo() {
+            gapi.client.load('oauth2', 'v2', function() {
+                var request = gapi.client.oauth2.userinfo.get();
+                    request.execute(getUserInfoCallback);
+            });
+        }
+
+        function getUserInfoCallback(obj) {
+            console.log(obj);
+        }
+
+        function loadSpreadSheets() {
+            var sheetkey = '13M4ACBGWNQ8-iG5qbwirJF9uTGhaiuvBXhbK34qjNoM';
+            var url = 'https://spreadsheets.google.com/feeds/list/' + sheetkey + '/2/private/full?alt=json&access_token=' + oauthToken;
+
+            console.log(url);
+
+            $http.get(url).success(function(data){
+                console.log(data.feed.entry);
+            });
+        }
+
+        function onApiLoad() {
+          window.gapiAuthLoaded = true;
+          //set the following up to avoid pop ups
+          gapi.load('auth',{'callback' : onAuthApiLoad });
+        }
+
+        var script = document.createElement('script')
+            script.setAttribute("type","text/javascript")
+            script.setAttribute("src", 'https://apis.google.com/js/client.js?onload=onApiLoad');
+            script.onload = function() {
+                onApiLoad();
+            }
+        document.getElementsByTagName("head")[0].appendChild(script);
     }
   ]);
