@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="utf-8">
+  <title>My AngularJS App</title>
+  <script src="https://www.google.com/jsapi"></script>
+</head>
+<body>
+
+	<script src="bower_components/angular/angular.js"></script>
+	<script src="bower_components/angular-route/angular-route.js"></script>
+	<script src="js/app.js"></script>
+	<script src="js/services.js"></script>
+	<script src="js/controllers.js"></script>
+	<script src="js/filters.js"></script>
+	<script src="js/directives.js"></script>
+
+	<ul class="menu">
+		<li><a href="#/view1">view1</a></li>
+		<li><a href="#/view2/StarAccount">StarAccount</a></li>
+		<li><a href="#/view2/User">User</a></li>
+		<li><a href="#/view2/SendEmailLog">SendEmailLog</a></li>
+		<li><a href="#/view2/OnLineLog">OnLineLog</a></li>
+	</ul>
+
+	<div ng-view></div>
+
+</body>
+</html>
