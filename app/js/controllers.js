@@ -40,6 +40,8 @@ angular.module('myApp.controllers', []).
         var URL = 'https://docs.google.com/spreadsheets/d/13M4ACBGWNQ8-iG5qbwirJF9uTGhaiuvBXhbK34qjNoM/gviz/tq?sheet=' + tab;
         var query = new google.visualization.Query(URL);
         //runQuery();
+        var data,table;
+        var tablediv = document.getElementById("tablediv");
 
         (function (name) {
             if (name === undefined) {
@@ -55,23 +57,70 @@ angular.module('myApp.controllers', []).
         };
 
         function handleQueryResponse(resp) {
-            var data = resp.getDataTable();
+            if (resp.isError()) {
+                console.error('無法取得資料');
+                handleErrorResponse(resp, tablediv);
+            } else {
 
-            var table = new google.visualization.Table(document.getElementById("tablediv"));
+                data = resp.getDataTable();
+                table = new google.visualization.Table(tablediv);
+                table.draw(data);
 
-            table.draw(data);
+                /*
+                google.visualization.events.addListener(table, 'ready', readyHandler);
+                google.visualization.events.addListener(table, 'error', errorHandler);
+                */
+                google.visualization.events.addListener(table, 'select', selectHandler);
 
-            var jsonData = JSON.parse(data.toJSON());
-            var len = jsonData.rows.length;
+                var jsonData = JSON.parse(data.toJSON());
+                var len = jsonData.rows.length;
 
-            console.log(jsonData);
-        //debugger;;
-            /*for (var i = 0; i < len; ++i) {
-                var row = jsonData.rows[i];
-                for (var j = 0; j < row.c.length; ++j) {
-                    //console.log(row.c[j].v);
+                console.log(jsonData);
+                //debugger;;
+                /*for (var i = 0; i < len; ++i) {
+                    var row = jsonData.rows[i];
+                    for (var j = 0; j < row.c.length; ++j) {
+                        //console.log(row.c[j].v);
+                    }
+                }*/
+            }
+        }
+
+        function handleErrorResponse(response, container) {
+            var message = response.getMessage();
+            var detailedMessage = response.getDetailedMessage();
+            google.visualization.errors.addError(container, response.getMessage(),
+            response.getDetailedMessage(), {'showInTooltip': true})
+        }
+
+        function readyHandler(e) {
+            console.log('table ready');
+        }
+
+        function errorHandler(e) {
+            alert('Error handler: ' + e.message);
+        }
+
+        function selectHandler() {
+            var selection = table.getSelection();
+            var message = '';
+            for (var i = 0; i < selection.length; i++) {
+                var item = selection[i];
+                if (item.row != null && item.column != null) {
+                    var str = data.getFormattedValue(item.row, item.column);
+                    message += '{row:' + item.row + ',column:' + item.column + '} = ' + str + '\n';
+                } else if (item.row != null) {
+                    var str = data.getFormattedValue(item.row, 0);
+                    message += '{row:' + item.row + ', column:none}; value (col 0) = ' + str + '\n';
+                } else if (item.column != null) {
+                    var str = data.getFormattedValue(0, item.column);
+                    message += '{row:none, column:' + item.column + '}; value (row 0) = ' + str + '\n';
                 }
-            }*/
+            }
+            if (message == '') {
+                message = 'nothing';
+            }
+            alert('You selected ' + message);
         }
     }
   ]).controller('MyCtrl3', ['$scope', '$routeParams', '$http',
@@ -149,6 +198,7 @@ angular.module('myApp.controllers', []).
 
             $http.get(url).success(function(data){
                 console.log(data.feed.entry);
+                $scope.data = data.feed.entry;
             });
         }
 
