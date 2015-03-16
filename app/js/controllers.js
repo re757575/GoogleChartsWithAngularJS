@@ -160,6 +160,7 @@ angular.module('myApp.controllers', []).
         var handleAuthResult = function(authResult) {
 
           if (authResult && !authResult.error) {
+            authButton.style.display = 'none';
             oauthToken = authResult.access_token;
             loadUserInfo();
             loadSpreadSheets();
@@ -191,14 +192,24 @@ angular.module('myApp.controllers', []).
         }
 
         function loadSpreadSheets() {
-            var sheetkey = '13M4ACBGWNQ8-iG5qbwirJF9uTGhaiuvBXhbK34qjNoM';
-            var url = 'https://spreadsheets.google.com/feeds/list/' + sheetkey + '/2/private/full?alt=json&access_token=' + oauthToken;
+
+            var guid = {'StarAccount': 1, 'User': 2, 'SendEmailLog': 3, 'OnLineLog': 4};
+            // RC_Show
+            var url = 'https://script.google.com/macros/s/AKfycbyMCXoJJhtZWctoHxX9Ptv3f_aEi_P2pa9qZ4g7gYOqEssAqEw/exec?guid='+
+                guid.SendEmailLog +'&token='+ oauthToken +'&callback=JSON_CALLBACK';
 
             console.log(url);
-
-            $http.get(url).success(function(data){
-                console.log(data.feed.entry);
-                $scope.data = data.feed.entry;
+            $http.jsonp(url).success(function (data) {
+                if(data.error) {
+                    console.error(decodeURI(data.error.message));
+                } else {
+                    if(!data.feed) {
+                        console.error('非預期錯誤: 無法取得資料');
+                    } else {
+                        console.info(data);
+                        $scope.data = data.feed.entry;
+                    }
+                }
             });
         }
 
