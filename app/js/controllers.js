@@ -131,10 +131,10 @@ angular.module('myApp.controllers', []).
         var client_id = '530939257520-6mku54g807m56qqvirhc3qieqdnm9rrb.apps.googleusercontent.com',
         scopes = [
             'https://www.googleapis.com/auth/userinfo.email',
-            'https://www.googleapis.com/auth/spreadsheets',
-            'https://www.googleapis.com/auth/drive.file',
-            'https://www.googleapis.com/auth/drive',
-            'https://spreadsheets.google.com/feeds',
+            //'https://www.googleapis.com/auth/spreadsheets',
+            //'https://www.googleapis.com/auth/drive.file',
+            //'https://www.googleapis.com/auth/drive',
+            //'https://spreadsheets.google.com/feeds',
             ],
         // 本地使用OAuth要設定 hostsName => C:\Windows\System32\drivers\etc\hosts
         // 127.0.0.1       alex.dai.io
@@ -193,7 +193,7 @@ angular.module('myApp.controllers', []).
 
         function loadSpreadSheets() {
 
-            var action = 'query';
+            var action = 'register'; // register 、query
             var queryType = 1;
             var guid = {'StarAccount': 1, 'User': 2, 'SendEmailLog': 3, 'OnLineLog': 4};
             var tables = ['StarAccount', 'User', 'SendEmailLog', 'OnLineLog'];
