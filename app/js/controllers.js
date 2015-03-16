@@ -193,12 +193,13 @@ angular.module('myApp.controllers', []).
 
         function loadSpreadSheets() {
 
-            var type = 1;
+            var action = 'query';
+            var queryType = 1;
             var guid = {'StarAccount': 1, 'User': 2, 'SendEmailLog': 3, 'OnLineLog': 4};
             var tables = ['StarAccount', 'User', 'SendEmailLog', 'OnLineLog'];
             // RC_Show
-            var url = 'https://script.google.com/macros/s/AKfycbyMCXoJJhtZWctoHxX9Ptv3f_aEi_P2pa9qZ4g7gYOqEssAqEw/exec?guid='+
-                guid.StarAccount +'&tables='+ tables[0] +'&type='+type+'&token='+ oauthToken +'&callback=JSON_CALLBACK';
+            var url = 'https://script.google.com/macros/s/AKfycbyMCXoJJhtZWctoHxX9Ptv3f_aEi_P2pa9qZ4g7gYOqEssAqEw/exec?action='+
+                action +'&guid='+ guid.StarAccount +'&tables='+ tables[guid.User -1] +'&queryType='+queryType+'&token='+ oauthToken +'&callback=JSON_CALLBACK';
 
             console.log(url);
             $http.jsonp(url).success(function (data) {
@@ -208,12 +209,16 @@ angular.module('myApp.controllers', []).
                     if(!data) {
                         console.error('非預期錯誤: 無法取得資料');
                     } else {
-                        if (type == 1) {
+                        if (action == 'query') {
+                            if (queryType == 1) {
+                                console.info(data);
+                                $scope.data = data.feed.entry;
+                            } else {
+                                console.info(data);
+                                $scope.data = data.table.rows;
+                            }
+                        } else if (action == 'register') {
                             console.info(data);
-                            $scope.data = data.feed.entry;
-                        } else {
-                            console.info(data);
-                            $scope.data = data;
                         }
                     }
                 }
