@@ -159,24 +159,28 @@ angular.module('myApp.controllers', []).
 
         var handleAuthResult = function(authResult) {
 
-          if (authResult && !authResult.error) {
+        if (authResult && !authResult.error) {
             authButton.style.display = 'none';
             oauthToken = authResult.access_token;
             loadUserInfo();
             loadSpreadSheets();
 
-          } else {
-                // 未授權過,則顯示按鈕
-                authButton.style.display = 'block';
-                authButton.onclick = function() {
-                    if ('immediate_failed' === authResult.error) {
-                        OAuthModel = false; // 跳出授權視窗
-                        onApiLoad();
-                    } else {
-                        console.log('非預期錯誤: ' + authResult.error);
-                    }
-                };
-          }
+        } else {
+            // 未授權過,則顯示按鈕
+            authButton.style.display = 'block';
+            $scope.OAuth = function(n) {
+                OAuthModel = false; // 跳出授權視窗
+                onApiLoad();
+            };
+        }
+        if ('immediate_failed' === authResult.error) {
+            authButton.innerText = '認證授權';
+        } else if ('access_denied' === authResult.error) {
+            authButton.innerText = '你不接受此授權!';
+            authButton.disabled = true;
+        } else {
+            authButton.innerText = authResult.error;
+        }
           console.log(gapi.auth.getToken());
         };
 
@@ -238,5 +242,6 @@ angular.module('myApp.controllers', []).
                 onApiLoad();
             }
         document.getElementsByTagName("head")[0].appendChild(script);
+
     }
   ]);
