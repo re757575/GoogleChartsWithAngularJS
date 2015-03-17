@@ -143,46 +143,77 @@ angular.module('myApp.controllers', []).
         oauthToken;
 
         var authButton = document.getElementById('authButton');
-        authButton.style.display = 'none';
+        authButton.disabled = true;
 
         var onAuthApiLoad = function() {
             gapi.auth.authorize(
                 {
-                  'client_id' : client_id,
-                  //'redirect_uri' : redirect_uri,  // 不需要設定, 而是要在google console 設定JAVASCRIPT 來源
-                  'scope' : scopes,
-                  'immediate' : OAuthModel
+                    'client_id' : client_id,
+                    //'redirect_uri' : redirect_uri,  // 不需要設定, 而是要在google console 設定JAVASCRIPT 來源
+                    'scope' : scopes,
+                    'immediate' : OAuthModel,
+                    'cookie_policy': 'single_host_origin'
                 },
                 handleAuthResult
             );
         };
 
+        $scope.authResult = {};
         var handleAuthResult = function(authResult) {
+            $scope.authResult = authResult;
+            if (authResult && !authResult.error) {
+                // authButton.style.display = 'none';
+                oauthToken = authResult.access_token;
+                loadUserInfo();
+                //loadSpreadSheets();
 
-        if (authResult && !authResult.error) {
-            authButton.style.display = 'none';
-            oauthToken = authResult.access_token;
-            loadUserInfo();
-            loadSpreadSheets();
-
-        } else {
-            // 未授權過,則顯示按鈕
-            authButton.style.display = 'block';
-            $scope.OAuth = function(n) {
-                OAuthModel = false; // 跳出授權視窗
-                onApiLoad();
-            };
-        }
-        if ('immediate_failed' === authResult.error) {
-            authButton.innerText = '認證授權';
-        } else if ('access_denied' === authResult.error) {
-            authButton.innerText = '你不接受此授權!';
-            authButton.disabled = true;
-        } else {
-            authButton.innerText = authResult.error;
-        }
-          console.log(gapi.auth.getToken());
+            } else {
+                // 未授權過,則顯示按鈕
+                // authButton.style.display = 'block';
+                $scope.OAuth = function(n) {
+                    OAuthModel = false; // 跳出授權視窗
+                    onApiLoad();
+                };
+            }
+            if (authResult.error) {
+                if ('immediate_failed' === authResult.error) {
+                    authButton.innerText = '認證授權';
+                    authButton.disabled = false;
+                } else if ('access_denied' === authResult.error) {
+                    authButton.innerText = '你不接受此授權!';
+                    authButton.disabled = true;
+                } else {
+                    authButton.innerText = authResult.error;
+                }
+            } else {
+                authButton.innerText = '已授權';
+                authButton.disabled = true;
+            }
+                //checkSessionState();
+                console.log(authResult);
+                //console.log(gapi.auth);
+                console.log(authResult.access_token);
         };
+
+        function checkSessionState() {
+            var sessionParams = {
+                'client_id': client_id,
+                'session_state': null
+            };
+            gapi.auth.checkSessionState(sessionParams, function(state){
+                if (state == true) {
+                  document.getElementById("msg").textContent = "You be logged out";
+                } else {
+                  document.getElementById("msg").textContent = "You be logged in";
+                }
+            });
+        }
+
+        $scope.logout = function() {
+            gapi.auth.signOut();
+            console.log($scope.authResult);
+            //location.reload();
+        }
 
         function loadUserInfo() {
             gapi.client.load('oauth2', 'v2', function() {
@@ -236,7 +267,8 @@ angular.module('myApp.controllers', []).
         }
 
         var script = document.createElement('script')
-            script.setAttribute("type","text/javascript")
+            script.setAttribute("type","text/javascript");
+            script.async = true;
             script.setAttribute("src", 'https://apis.google.com/js/client.js?onload=onApiLoad');
             script.onload = function() {
                 onApiLoad();
