@@ -190,7 +190,7 @@ angular.module('myApp.controllers', []).
             }
         };
 
-         $scope.disconnectUser = function() {
+        $scope.disconnectUser = function() {
             var revokeUrl = 'https://accounts.google.com/o/oauth2/revoke?token=' + gapi.auth.getToken().access_token;
             $.ajax({
                 type: 'GET',
