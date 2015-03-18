@@ -130,89 +130,106 @@ angular.module('myApp.controllers', []).
         var OAuthModel = true;
         var client_id = '530939257520-6mku54g807m56qqvirhc3qieqdnm9rrb.apps.googleusercontent.com',
         scopes = [
+            'https://www.googleapis.com/auth/plus.login',
             'https://www.googleapis.com/auth/userinfo.email',
-            //'https://www.googleapis.com/auth/spreadsheets',
-            //'https://www.googleapis.com/auth/drive.file',
-            //'https://www.googleapis.com/auth/drive',
+            'https://www.googleapis.com/auth/spreadsheets',
+            'https://www.googleapis.com/auth/drive.file',
+            'https://www.googleapis.com/auth/drive',
             //'https://spreadsheets.google.com/feeds',
             ],
         // 本地使用OAuth要設定 hostsName => C:\Windows\System32\drivers\etc\hosts
         // 127.0.0.1       alex.dai.io
         // 代理伺服器要關閉
         redirect_uri = "http://alex.dai.io:3000",
-        oauthToken;
+        oauthToken,
+        scopesStr = '';
 
-        var authButton = document.getElementById('authButton');
-        authButton.disabled = true;
+        for (var i = 0; i < scopes.length; i++ ) {
+            if (i < scopes.length-1) {
+                scopesStr += scopes[i] + ' ';
+            } else {
+                scopesStr += scopes[i];
+            }
+        }
 
-        var onAuthApiLoad = function() {
-            gapi.auth.authorize(
-                {
-                    'client_id' : client_id,
-                    //'redirect_uri' : redirect_uri,  // 不需要設定, 而是要在google console 設定JAVASCRIPT 來源
-                    'scope' : scopes,
-                    'immediate' : OAuthModel,
-                    'cookie_policy': 'single_host_origin'
-                },
-                handleAuthResult
-            );
+        var session_state = '';
+        $scope.render = function() {
+            gapi.signin.render('google_login', {
+                'callback': $scope.signinCallback,
+                'approvalprompt': 'auto',
+                'clientid': '530939257520-6mku54g807m56qqvirhc3qieqdnm9rrb.apps.googleusercontent.com',
+                'cookiepolicy': 'single_host_origin',
+                'requestvisibleactions': 'http://schemas.google.com/AddActivity',
+                'scope': scopesStr
+            });
         };
 
-        $scope.authResult = {};
-        var handleAuthResult = function(authResult) {
-            $scope.authResult = authResult;
-            if (authResult && !authResult.error) {
-                // authButton.style.display = 'none';
-                oauthToken = authResult.access_token;
-                loadUserInfo();
-                //loadSpreadSheets();
+        $scope.signinCallback = function(authResult) {
+            //console.log(authResult);
 
-            } else {
-                // 未授權過,則顯示按鈕
-                // authButton.style.display = 'block';
-                $scope.OAuth = function(n) {
-                    OAuthModel = false; // 跳出授權視窗
-                    onApiLoad();
-                };
-            }
-            if (authResult.error) {
-                if ('immediate_failed' === authResult.error) {
-                    authButton.innerText = '認證授權';
-                    authButton.disabled = false;
-                } else if ('access_denied' === authResult.error) {
-                    authButton.innerText = '你不接受此授權!';
-                    authButton.disabled = true;
-                } else {
-                    authButton.innerText = authResult.error;
+            if (authResult) {
+                if(authResult["error"] == undefined) {
+
+                    $("#google_login").hide();
+
+                    gapi.client.load('plus','v1',function() {
+                        var request=gapi.client.plus.people.get({'userId':'me'});
+                        request.execute(function(profile) {
+                            $("#name").html(profile["displayName"]);
+                            $("#age").html(profile["ageRange"]["min"]);
+                            $("#head").attr("src",profile["image"]["url"]+"&sz=200");
+                        });
+                    });
+
+                    loadUserInfo();
+                    oauthToken = authResult.access_token;
+                    $("#vip").show();
+                    $("#logout").show();
+                    loadSpreadSheets();
                 }
-            } else {
-                authButton.innerText = '已授權';
-                authButton.disabled = true;
             }
-                //checkSessionState();
-                console.log(authResult);
-                //console.log(gapi.auth);
-                console.log(authResult.access_token);
+        };
+
+         $scope.disconnectUser = function() {
+            var revokeUrl = 'https://accounts.google.com/o/oauth2/revoke?token=' + gapi.auth.getToken().access_token;
+            $.ajax({
+                type: 'GET',
+                url: revokeUrl,
+                async: false,
+                contentType: "application/json",
+                dataType: 'jsonp',
+                success: function(nullResponse) {
+                    $("#vip").hide();
+                    $("#google_login").show();
+                    alert("退出成功！");
+                },
+                error: function(e) {
+                    alert("取消應用程式連結失敗！請到 https://plus.google.com/apps 解除！");
+                    window.open("https://plus.google.com/apps");
+                }
+            });
+        };
+
+        $scope.logout = function() {
+            gapi.auth.signOut();
+            $("#logout").hide();
+            location.reload();
         };
 
         function checkSessionState() {
             var sessionParams = {
                 'client_id': client_id,
-                'session_state': null
+                'session_state': session_state
             };
+
             gapi.auth.checkSessionState(sessionParams, function(state){
+                console.log(state);
                 if (state == true) {
-                  document.getElementById("msg").textContent = "You be logged out";
+                    console.log("You be logged out");
                 } else {
-                  document.getElementById("msg").textContent = "You be logged in";
+                    console.log("You be logged in");
                 }
             });
-        }
-
-        $scope.logout = function() {
-            gapi.auth.signOut();
-            console.log($scope.authResult);
-            //location.reload();
         }
 
         function loadUserInfo() {
@@ -224,20 +241,27 @@ angular.module('myApp.controllers', []).
 
         function getUserInfoCallback(obj) {
             console.log(obj);
+            if(obj["email"]){
+                $("#email").html(obj["email"]);
+            }
         }
 
         function loadSpreadSheets() {
 
-            var action = 'register'; // register 、query
-            var queryType = 1;
+            var action = 'register'; // register 、 query
+            var queryType = 2;
             var guid = {'StarAccount': 1, 'User': 2, 'SendEmailLog': 3, 'OnLineLog': 4};
             var tables = ['StarAccount', 'User', 'SendEmailLog', 'OnLineLog'];
             // RC_Show
             var url = 'https://script.google.com/macros/s/AKfycbyMCXoJJhtZWctoHxX9Ptv3f_aEi_P2pa9qZ4g7gYOqEssAqEw/exec?action='+
                 action +'&guid='+ guid.StarAccount +'&tables='+ tables[guid.User -1] +'&queryType='+queryType+'&token='+ oauthToken +'&callback=JSON_CALLBACK';
 
-            console.log(url);
+            console.log(oauthToken);
             $http.jsonp(url).success(function (data) {
+                if(data === undefined) {
+                    console.error('非預期錯誤: 無法取得資料');
+                    return false;
+                }
                 if(data.error) {
                     console.error(decodeURI(data.error.message));
                 } else {
@@ -260,20 +284,15 @@ angular.module('myApp.controllers', []).
             });
         }
 
-        function onApiLoad() {
-          window.gapiAuthLoaded = true;
-          //set the following up to avoid pop ups
-          gapi.load('auth',{'callback' : onAuthApiLoad });
-        }
-
-        var script = document.createElement('script')
-            script.setAttribute("type","text/javascript");
-            script.async = true;
-            script.setAttribute("src", 'https://apis.google.com/js/client.js?onload=onApiLoad');
-            script.onload = function() {
-                onApiLoad();
-            }
-        document.getElementsByTagName("head")[0].appendChild(script);
-
+        (function() {
+            var script = document.createElement('script')
+                script.setAttribute("type","text/javascript");
+                script.async = true;
+                script.setAttribute("src", 'https://apis.google.com/js/client:plusone.js?onload=render');
+                script.onload = function() {
+                    $scope.render();
+                }
+            document.getElementsByTagName("head")[0].appendChild(script);
+        })();
     }
   ]);
