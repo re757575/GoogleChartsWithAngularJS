@@ -23,9 +23,16 @@ config(['$routeProvider',
 			templateUrl: '/partials/partial2.html',
 			controller: 'MyCtrl2'
 		}).
-		when('/googleOAuth', {
+		when('/login', {
 			templateUrl: '/partials/googleOAuth.html',
 			controller: 'MyCtrl3'
+		}).
+		when('/rc', {
+			templateUrl: '/partials/partial3.html',
+			controller: 'MyCtrl4'
+		}).
+		when('/index', {
+			controller: 'indexCtrl'
 		}).
 		otherwise({
 			redirectTo: '/'
