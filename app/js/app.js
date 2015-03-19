@@ -10,39 +10,42 @@
 // Declare app level module which depends on filters, and services
 angular.module('myApp', [
   'ngRoute',
-  'myApp.controllers'
+  'myApp.controllers',
+  'myApp.services'
 ]).
 config(['$routeProvider',
 	function($routeProvider) {
 		$routeProvider.
-		when('/view1', {
-			templateUrl: '/partials/partial1.html',
-			controller: 'MyCtrl1'
-		}).
-		when('/view2/:tab', {
-			templateUrl: '/partials/partial2.html',
-			controller: 'MyCtrl2'
-		}).
 		when('/login', {
-			templateUrl: '/partials/googleOAuth.html',
-			controller: 'MyCtrl3'
+			templateUrl: '/partials/login.html',
+			controller: 'LoginCtrl'
 		}).
-		when('/rc', {
-			templateUrl: '/partials/partial3.html',
-			controller: 'MyCtrl4'
+		when('/home', {
+			templateUrl: '/partials/home.html',
+			//controller: 'homeCtrl'
 		}).
-		when('/index', {
-			controller: 'indexCtrl'
+		when('/view1', {
+			templateUrl: '/partials/view1.html',
+			controller: 'view1Ctrl'
+		}).
+		when('/RC-Data-List', {
+			templateUrl: '/partials/RC_Data_List.html',
+			//controller: 'MyCtrl1'
+		}).
+		when('/RC_Data/:tab', {
+			templateUrl: '/partials/RC_Data.html',
+			controller: 'RC_Ctrl'
 		}).
 		otherwise({
-			redirectTo: '/'
+			redirectTo: '/login'
 		});
 }]).
-run(function($rootScope, $location) {
-  var routesThatRequireAuth = ['/view2','/rc'];
+run(function($rootScope, $location, AuthService) {
+  var routesThatRequireAuth = ['/home','/RC-Data-List'];
 
   $rootScope.$on('$routeChangeStart', function(event, next, current) {
-    if(_(routesThatRequireAuth).contains($location.path())) {
+    if(_(routesThatRequireAuth).contains($location.path()) && AuthService.getToken() == null) {
+    	debugger;
       $location.path('/login');
     }
   });

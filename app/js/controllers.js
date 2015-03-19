@@ -16,24 +16,7 @@ google.setOnLoadCallback(function() {
 });
 
 angular.module('myApp.controllers', []).
-    factory('AuthService', /*['$rootScope','$http',*/function(/*$rootScope, $http*/) {
-        return {
-            token: null,
-            setToken: function(n) {
-                this.token = n;
-            },
-            getToken: function() {
-                return this.token;
-            }
-        };
-    }/*]*/).
-    controller('indexCtrl', ['$scope', '$window' ,'AuthService',
-        function($scope, $window, AuthService) {
-            $("#login").show();
-            $window.location.href = '/';
-        }
-    ]).
-    controller('MyCtrl1', ['$scope', 'AuthService',
+    controller('view1Ctrl', ['$scope', 'AuthService',
         function($scope, AuthService) {
             var data = google.visualization.arrayToDataTable([
                 ['Year', 'Sales', 'Expenses'],
@@ -50,10 +33,11 @@ angular.module('myApp.controllers', []).
             chart.draw(data, options);
         }
     ]).
-    controller('MyCtrl2', ['$scope', '$routeParams', 'AuthService',
-        function($scope, $routeParams, AuthService) {
+    controller('RC_Ctrl', ['$scope', '$routeParams', '$location', 'AuthService',
+        function($scope, $routeParams, $location, AuthService) {
+
             if(AuthService.getToken() == null) {
-                return false;
+                $location.path('/login');
             }
             var tab = $routeParams.tab;
             var tables = ['StarAccount', 'User', 'SendEmailLog', 'OnLineLog'];
@@ -144,9 +128,9 @@ angular.module('myApp.controllers', []).
             }
         }
     ]).
-    controller('MyCtrl3', ['$scope', '$routeParams', '$http', '$window', 'AuthService',
-        function($scope, $routeParams, $http, $window, AuthService) {
-            //$("#login").hide();
+    controller('LoginCtrl', ['$scope', '$routeParams', '$http', '$location', 'AuthService',
+        function($scope, $routeParams, $http, $location, AuthService) {
+
             // Google Console 專案名稱: RC-JSON-Data
             var OAuthModel = true;
             var client_id = '530939257520-6mku54g807m56qqvirhc3qieqdnm9rrb.apps.googleusercontent.com',
@@ -186,7 +170,6 @@ angular.module('myApp.controllers', []).
             };
 
             $scope.signinCallback = function(authResult) {
-                //console.log(authResult);
 
                 if (authResult) {
                     if(authResult["error"] == undefined) {
@@ -202,13 +185,16 @@ angular.module('myApp.controllers', []).
                             });
                         });
 
-                        loadUserInfo();
+                        //loadUserInfo();
                         oauthToken = authResult.access_token;
                         AuthService.setToken(oauthToken);
                         //$("#vip").show();
                         //$("#logout").show();
                         //loadSpreadSheets();
-                        $window.location.href = '/#/rc';
+                        $location.path('/home');
+                        // 因為使用第三官方的XHR,需使用 $scope.$apply() 告知 location 已變更
+                        $scope.$apply();
+                        //debugger;
                     } else {
                         $("#google_login").show();
                     }
@@ -314,15 +300,11 @@ angular.module('myApp.controllers', []).
                 var script = document.createElement('script')
                     script.setAttribute("type","text/javascript");
                     script.async = true;
-                    script.setAttribute("src", 'https://apis.google.com/js/client:plusone.js?onload=render');
+                    script.setAttribute("src", 'https://apis.google.com/js/client:plusone.js');
                     script.onload = function() {
                         $scope.render();
                     }
                 document.getElementsByTagName("head")[0].appendChild(script);
             })();
-        }
-    ]).controller('MyCtrl4', ['$scope', '$routeParams', 'AuthService',
-        function($scope, $routeParams, $http, AuthService) {
-            $('#login').hide();
         }
     ]);
