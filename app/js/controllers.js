@@ -17,10 +17,11 @@ google.setOnLoadCallback(function() {
 });
 
 angular.module('myApp.controllers', []).
-    controller('indexCtrl', ['$scope', '$location', 'AuthService', function($scope, $location, AuthService){
+    controller('indexCtrl', ['$scope', '$window', 'AuthService', function($scope, $window, AuthService){
         $scope.logout = function() {
             gapi.auth.signOut();
-            $location.path('/login');
+            //$location.path('/');
+            $window.location.href = '/';
         }
     }]).
     controller('view1Ctrl', ['$scope', 'AuthService',
@@ -141,10 +142,10 @@ angular.module('myApp.controllers', []).
             if (AuthService.isLoggedIn === false) {
                 AuthService.clearToken();
                 $("#logout").hide();
-                $("#google_login").show();
                 //debugger;
             }
             AuthService.render('/home');
+
             console.log(AuthService.getToken()); //  == null , 因為callback未執行完畢
         }
     ]);

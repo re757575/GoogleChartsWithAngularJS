@@ -183,7 +183,7 @@ angular.module('myApp.services', []).
 		}
 
 	    return {
-			isLoggedIn: isLoggedIn,
+			isLoggedIn: null,
 	        token: null,
 	        config: config,
 	        getToken: function() {
@@ -193,6 +193,8 @@ angular.module('myApp.services', []).
 	        	this.token = null;
 	        },
 	        render: function(redirectPath) {
+				$("#loader").show();
+				$("#google_login").hide();
 				var that = this;
 				gapi.signin.render('google_login', {
 				    'callback': function(authResult) {
@@ -208,6 +210,7 @@ angular.module('myApp.services', []).
 					            $("#google_login").show();
 					        }
 					    }
+					    $("#loader").hide();
 					    //debugger;
 				    },
 				    'approvalprompt': 'auto',

@@ -1,3 +1,79 @@
+<style type="text/css">
+html, body {
+    /* give this to all tags from html to .fullscreen */
+    height:100%;
+    background-color: #FBE9E7;
+}
+
+.loader {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background: #fff;
+    z-index: 9999;
+    text-align: center;
+    -webkit-transition: all .5s ease;
+    -moz-transition: all .5s ease;
+    transition: all .5s ease;
+    opacity: 1;
+    background-color: #FBE9E7;
+}
+.spinner {
+    width: 40px;
+    height: 40px;
+    position: relative;
+    top: 50%;
+    left: 50%;
+    margin-left: -20px;
+    margin-top: -20px
+    background-color: #FBE9E7;
+}
+.google_login {
+    top: 50%;
+    left: 50%;
+}
+
+.double-bounce1,
+.double-bounce2 {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background-color: #E64A19;
+    opacity: .7;
+    position: absolute;
+    top: 0;
+    left: 0;
+    -webkit-animation: bounce 2s infinite ease-in-out;
+    animation: bounce 2s infinite ease-in-out
+}
+.double-bounce2 {
+    -webkit-animation-delay: -1s;
+    animation-delay: -1s
+}
+@-webkit-keyframes bounce {
+    0%, 100% {
+        -webkit-transform: scale(0)
+    }
+    50% {
+        -webkit-transform: scale(1)
+    }
+}
+@keyframes bounce {
+    0%, 100% {
+        transform: scale(0);
+        -webkit-transform: scale(0)
+    }
+    50% {
+        transform: scale(1);
+        -webkit-transform: scale(1)
+    }
+}
+.google-login-img {
+	margin-top: 20%;
+	margin-left: 30%;
+}
+</style>
+
 <div id="vip" style="color:red;display:none;">
 	<img id="head" /><br />
 	email：<span id="email"></span><br />
@@ -8,6 +84,11 @@
 
 <span id="google_login" style="display:none;">
 	<a href="javascript:;">
-		<img width="200" src="images/sign-in-with-google.png" alt="Sign-In with Google">
+		<img width="400" class="google-login-img" src="images/sign-in-with-google.png" alt="Sign-In with Google">
 	</a>
 </span>
+<div id="loader" class="loader" style="display: none;">
+	<div class="spinner">
+	<div class="double-bounce1"></div>
+	<div class="double-bounce2"></div>
+</div>

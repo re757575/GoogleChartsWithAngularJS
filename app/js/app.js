@@ -42,15 +42,15 @@ config(['$routeProvider',
 run(function($rootScope, $location, AuthService) {
   var routesThatRequireAuth = ['/home','/RC-Data-List','/login'];
 
-  $rootScope.$on('$routeChangeStart', function(event, next, current) {
-	//console.log(AuthService);
-    if(_(routesThatRequireAuth).contains($location.path()) && AuthService.isLoggedIn === false) {
-		//debugger;
-		$location.path('/login');
-    } else {
-		if($location.path() == '/login') {
-			$location.path('/home');
+	$rootScope.$on('$routeChangeStart', function(event, next, current) {
+		console.log(AuthService);
+		if(_(routesThatRequireAuth).contains($location.path()) && AuthService.isLoggedIn !== true) {
+			//debugger;
+			$location.path('/login');
+		} else {
+			if($location.path() == '/login') {
+				$location.path('/home');
+			}
 		}
-    }
-  });
+	});
 });
