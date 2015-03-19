@@ -30,7 +30,6 @@ config(['$routeProvider',
 		}).
 		when('/RC-Data-List', {
 			templateUrl: '/partials/RC_Data_List.html',
-			//controller: 'MyCtrl1'
 		}).
 		when('/RC_Data/:tab', {
 			templateUrl: '/partials/RC_Data.html',
@@ -41,12 +40,17 @@ config(['$routeProvider',
 		});
 }]).
 run(function($rootScope, $location, AuthService) {
-  var routesThatRequireAuth = ['/home','/RC-Data-List'];
+  var routesThatRequireAuth = ['/home','/RC-Data-List','/login'];
 
   $rootScope.$on('$routeChangeStart', function(event, next, current) {
-    if(_(routesThatRequireAuth).contains($location.path()) && AuthService.getToken() == null) {
-    	debugger;
-      $location.path('/login');
+	//console.log(AuthService);
+    if(_(routesThatRequireAuth).contains($location.path()) && AuthService.isLoggedIn === false) {
+		//debugger;
+		$location.path('/login');
+    } else {
+		if($location.path() == '/login') {
+			$location.path('/home');
+		}
     }
   });
 });
