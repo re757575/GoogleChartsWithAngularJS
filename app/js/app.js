@@ -37,4 +37,13 @@ config(['$routeProvider',
 		otherwise({
 			redirectTo: '/'
 		});
-}]);
+}]).
+run(function($rootScope, $location) {
+  var routesThatRequireAuth = ['/view2','/rc'];
+
+  $rootScope.$on('$routeChangeStart', function(event, next, current) {
+    if(_(routesThatRequireAuth).contains($location.path())) {
+      $location.path('/login');
+    }
+  });
+});
