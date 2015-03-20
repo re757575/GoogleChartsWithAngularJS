@@ -8,7 +8,8 @@
 'use strict';
 
 angular.module('myApp.services', []).
-	factory('AuthService', ['$rootScope','$http', '$q', '$location', function($rootScope, $http, $q, $location) {
+	factory('AuthService', ['$rootScope','$http', '$q', '$location', '$window',
+		function($rootScope, $http, $q, $location, $window) {
 
 		// Google Console 專案名稱: RC-JSON-Data
 		var service = {
@@ -27,6 +28,7 @@ angular.module('myApp.services', []).
 
 				token: null,
 				isLoggedIn: null,
+				session_state: null,
 
 				getToken: function() {
 				    return this.token;
@@ -48,7 +50,11 @@ angular.module('myApp.services', []).
 					return scopesStr;
 				},
 				render: render,
-				loadUserInfo: loadUserInfo
+				logout: logout,
+				loadUserInfo: loadUserInfo,
+				checkSessionState: checkSessionState,
+				loadSpreadSheets: loadSpreadSheets,
+				disconnectUser: disconnectUser
 		};
 
 		return service;
@@ -56,12 +62,14 @@ angular.module('myApp.services', []).
         function render() {
             gapi.signin.render('google_login', {
                 'callback': function(authResult) {
+				console.log(authResult);
 				$("#loader").show();
 				$("#google_login").hide();
 					if (authResult) {
 					    if(authResult["error"] == undefined) {
 					        service.token = authResult.access_token;
 					        service.isLoggedIn = true;
+					        service.session_state = authResult.session_state
 					        $location.path(service.config.redirectPath);
 					        $rootScope.$apply();
 							$("#logout").show();
@@ -81,7 +89,7 @@ angular.module('myApp.services', []).
         };
 
 		function disconnectUser() {
-		    var revokeUrl = 'https://accounts.google.com/o/oauth2/revoke?token=' + gapi.auth.getToken().access_token;
+		    var revokeUrl = 'https://accounts.google.com/o/oauth2/revoke?token=' + service.token;
 		    $.ajax({
 		        type: 'GET',
 		        url: revokeUrl,
@@ -89,9 +97,9 @@ angular.module('myApp.services', []).
 		        contentType: "application/json",
 		        dataType: 'jsonp',
 		        success: function(nullResponse) {
-		            $("#vip").hide();
-		            $("#google_login").show();
-		            alert("退出成功！");
+		            alert("取消應用程式連結成功！, 將自動登出");
+		            service.logout();
+		            window.open("https://plus.google.com/apps");
 		        },
 		        error: function(e) {
 		            alert("取消應用程式連結失敗！請到 https://plus.google.com/apps 解除！");
@@ -102,20 +110,19 @@ angular.module('myApp.services', []).
 
 		function logout() {
 		    gapi.auth.signOut();
-            that.isLoggedIn = false;
+            service.isLoggedIn = false;
+            service.token = null;
             $("#google_login").show();
-		    $location.path('/login');
-		    $rootScope.$apply();
+		    $window.location.href = '/';
 		};
 
 		function checkSessionState() {
 		    var sessionParams = {
-		        'client_id': client_id,
-		        'session_state': session_state
+		        'client_id': service.config.client_id,
+		        'session_state': service.session_state
 		    };
-
 		    gapi.auth.checkSessionState(sessionParams, function(state){
-		        console.log(state);
+				//console.log(sessionParams);
 		        if (state == true) {
 		            console.log("You be logged out");
 		        } else {
@@ -133,23 +140,21 @@ angular.module('myApp.services', []).
 
 		function getUserInfoCallback(obj) {
 		    console.log(obj);
-		    if(obj["email"]){
-		        $("#email").html(obj["email"]);
-		    }
+		    return obj;
 		}
 
 		function loadSpreadSheets() {
 
 		    var action = 'register'; // register 、 query
-		    var queryType = 2;
+		    var queryType = 2; // only action = query
 		    var guid = {'StarAccount': 1, 'User': 2, 'SendEmailLog': 3, 'OnLineLog': 4};
 		    var tables = ['StarAccount', 'User', 'SendEmailLog', 'OnLineLog'];
-		    // RC_Show
+		    // RC_Show gas api
 		    var url = 'https://script.google.com/macros/s/AKfycbyMCXoJJhtZWctoHxX9Ptv3f_aEi_P2pa9qZ4g7gYOqEssAqEw/exec?action='+
-		        action +'&guid='+ guid.StarAccount +'&tables='+ tables[guid.User -1] +'&queryType='+queryType+'&token='+ oauthToken +'&callback=JSON_CALLBACK';
+		        action +'&guid='+ guid.StarAccount +'&tables='+ tables[guid.User -1] +'&queryType='+queryType+'&token='+ service.token +'&callback=JSON_CALLBACK';
 
-		    console.log(oauthToken);
 		    $http.jsonp(url).success(function (data) {
+				//debugger;
 		        if(data === undefined) {
 		            console.error('非預期錯誤: 無法取得資料');
 		            return false;
@@ -169,7 +174,7 @@ angular.module('myApp.services', []).
 		                        //$scope.data = data.table.rows;
 		                    }
 		                } else if (action == 'register') {
-		                    console.info(data);
+		                    console.info(data.result);
 		                }
 		            }
 		        }

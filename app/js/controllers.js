@@ -19,9 +19,14 @@ google.setOnLoadCallback(function() {
 angular.module('myApp.controllers', []).
     controller('indexCtrl', ['$scope', '$window', 'AuthService', function($scope, $window, AuthService){
         $scope.logout = function() {
-            gapi.auth.signOut();
-            //$location.path('/');
-            $window.location.href = '/';
+            AuthService.logout();
+        }
+    }]).
+    controller('homeCtrl', ['$scope', 'AuthService', function($scope, AuthService) {
+        if (AuthService.isLoggedIn) {
+            AuthService.loadUserInfo();
+            AuthService.checkSessionState();
+            AuthService.loadSpreadSheets();
         }
     }]).
     controller('view1Ctrl', ['$scope', 'AuthService',
@@ -39,15 +44,19 @@ angular.module('myApp.controllers', []).
             var chart = new google.visualization.LineChart(document.getElementById('chartdiv'));
 
             chart.draw(data, options);
+            if (AuthService.isLoggedIn) {
+                $("#homeLink").show();
+            }
         }
     ]).
     controller('RC_Ctrl', ['$scope', '$routeParams', '$location', 'AuthService',
         function($scope, $routeParams, $location, AuthService) {
 
-            $scope.change = function(){alert();};
-            if(AuthService.getToken() == null) {
+            // TODO 因為有參數 所以 $routeChangeStart location.path 無法吻合, 需修增加判斷
+            if (AuthService.getToken() == null) {
                 $location.path('/login');
             }
+
             var tab = $routeParams.tab;
             var tables = ['StarAccount', 'User', 'SendEmailLog', 'OnLineLog'];
             var URL = 'https://docs.google.com/spreadsheets/d/13M4ACBGWNQ8-iG5qbwirJF9uTGhaiuvBXhbK34qjNoM/gviz/tq?sheet=' + tab;
@@ -140,7 +149,7 @@ angular.module('myApp.controllers', []).
     controller('LoginCtrl', ['$scope', '$routeParams', '$http', '$location', '$q', 'AuthService',
         function($scope, $routeParams, $http, $location, $q, AuthService) {
 
-            if (AuthService.isLoggedIn === false) {
+            if (!AuthService.isLoggedIn) {
                 AuthService.clearToken();
                 $("#logout").hide();
                 //debugger;
