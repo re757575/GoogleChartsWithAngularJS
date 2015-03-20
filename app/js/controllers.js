@@ -139,13 +139,14 @@ angular.module('myApp.controllers', []).
     ]).
     controller('LoginCtrl', ['$scope', '$routeParams', '$http', '$location', '$q', 'AuthService',
         function($scope, $routeParams, $http, $location, $q, AuthService) {
+
             if (AuthService.isLoggedIn === false) {
                 AuthService.clearToken();
                 $("#logout").hide();
                 //debugger;
             }
-            AuthService.render('/home');
-
+            AuthService.render();
+            //debugger;
             console.log(AuthService.getToken()); //  == null , 因為callback未執行完畢
         }
     ]);
