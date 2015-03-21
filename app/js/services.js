@@ -104,7 +104,6 @@ angular.module('myApp.services', []).
 		        success: function(nullResponse) {
 		            alert("取消應用程式連結成功！, 將自動登出");
 		            service.logout();
-		            window.open("https://plus.google.com/apps");
 		        },
 		        error: function(e) {
 		            alert("取消應用程式連結失敗！請到 https://plus.google.com/apps 解除！");

@@ -24,7 +24,14 @@ angular.module('myApp.controllers', []).
     }]).
     controller('homeCtrl', ['$scope', 'AuthService', function($scope, AuthService) {
         if (AuthService.isLoggedIn) {
-            //AuthService.loadUserInfo();
+
+            AuthService.loadUserInfo().then(function(data) {
+                $scope.userInfo = data;
+                $scope.disconnectUser = AuthService.disconnectUser;
+                $('#vip').show();
+                console.log('AuthService.loadUserInfo() 執行完畢!');
+            });
+
             AuthService.checkSessionState();
             AuthService.loadSpreadSheets().then(
                 function(data) {
@@ -176,10 +183,7 @@ angular.module('myApp.controllers', []).
                     $("#google_login").show();
                 }
             ).then(function() {
-                AuthService.loadUserInfo().then(function(data) {
-                    console.log(data);
-                    console.log('AuthService.loadUserInfo() 執行完畢!');
-                });
+
             });
         }
     ]);
