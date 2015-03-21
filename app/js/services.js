@@ -59,12 +59,14 @@ angular.module('myApp.services', []).
 
 		return service;
 
-        function render() {
+        function render(loginBtn, loader) {
+			console.log('AuthService.render() 開始執行!');
+			var def = $q.defer();
             gapi.signin.render('google_login', {
                 'callback': function(authResult) {
-				console.log(authResult);
-				$("#loader").show();
-				$("#google_login").hide();
+				//console.log(authResult);
+				$(loader).show();
+				$(loginBtn).hide();
 					if (authResult) {
 					    if(authResult["error"] == undefined) {
 					        service.token = authResult.access_token;
@@ -73,12 +75,13 @@ angular.module('myApp.services', []).
 					        $location.path(service.config.redirectPath);
 					        $rootScope.$apply();
 							$("#logout").show();
+							def.resolve('Auth驗證:通過');
 					    } else {
 					        service.isLoggedIn = false;
-					        $("#google_login").show();
+					        $(loginBtn).show();
+					        def.reject('Auth驗證:不通過');
 					    }
 					}
-					$("#loader").hide();
 				},
                 'approvalprompt': 'auto',
                 'clientid': service.config.client_id,
@@ -86,6 +89,7 @@ angular.module('myApp.services', []).
                 'requestvisibleactions': 'http://schemas.google.com/AddActivity',
                 'scope': service.getScopeString()
             });
+			return def.promise;
         };
 
 		function disconnectUser() {
@@ -132,20 +136,21 @@ angular.module('myApp.services', []).
 		}
 
 		function loadUserInfo() {
+			var def = $q.defer();
+			console.log('AuthService.loadUserInfo() 開始執行!');
 		    gapi.client.load('oauth2', 'v2', function() {
 		        var request = gapi.client.oauth2.userinfo.get();
-		            request.execute(getUserInfoCallback);
+		            request.execute(function(obj) {
+						console.log('AuthService.loadUserInfo callback 執行完畢!');
+						def.resolve(obj);
+		            });
 		    });
-		}
-
-		function getUserInfoCallback(obj) {
-		    console.log(obj);
-		    return obj;
+		    return def.promise;
 		}
 
 		function loadSpreadSheets() {
 
-		    var action = 'register'; // register 、 query
+		    var action = 'query'; // register 、 query
 		    var queryType = 2; // only action = query
 		    var guid = {'StarAccount': 1, 'User': 2, 'SendEmailLog': 3, 'OnLineLog': 4};
 		    var tables = ['StarAccount', 'User', 'SendEmailLog', 'OnLineLog'];
@@ -153,32 +158,40 @@ angular.module('myApp.services', []).
 		    var url = 'https://script.google.com/macros/s/AKfycbyMCXoJJhtZWctoHxX9Ptv3f_aEi_P2pa9qZ4g7gYOqEssAqEw/exec?action='+
 		        action +'&guid='+ guid.StarAccount +'&tables='+ tables[guid.User -1] +'&queryType='+queryType+'&token='+ service.token +'&callback=JSON_CALLBACK';
 
+			var def = $q.defer();
 		    $http.jsonp(url).success(function (data) {
 				//debugger;
 		        if(data === undefined) {
-		            console.error('非預期錯誤: 無法取得資料');
-		            return false;
+		            //console.error('非預期錯誤: 無法取得資料');
+		            def.reject('非預期錯誤: 無法取得資料');
 		        }
 		        if(data.error) {
-		            console.error(decodeURI(data.error.message));
+					//console.error(decodeURI(data.error.message));
+					def.reject(decodeURI(data.error.message));
 		        } else {
 		            if(!data) {
-		                console.error('非預期錯誤: 無法取得資料');
+		                //console.error('非預期錯誤: 無法取得資料');
+		                def.reject('非預期錯誤: 無法取得資料');
 		            } else {
 		                if (action == 'query') {
 		                    if (queryType == 1) {
-		                        console.info(data);
+		                        //console.info(data);
+		                        def.resolve(data);
 		                        //$scope.data = data.feed.entry;
 		                    } else {
-		                        console.info(data);
+		                        //console.info(data);
+		                        def.resolve(data);
 		                        //$scope.data = data.table.rows;
 		                    }
 		                } else if (action == 'register') {
-		                    console.info(data.result);
+		                    //console.info(data.result);
+		                    def.resolve(data.result);
 		                }
 		            }
 		        }
 		    });
+			$("#loader").hide();
+		    return def.promise;
 		}
 
 	}]);

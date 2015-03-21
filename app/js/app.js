@@ -44,7 +44,7 @@ run(function($rootScope, $location, AuthService) {
 	var routesThatRequireAuth = ['/home','/RC-Data-List','/login'];
 
 	$rootScope.$on('$routeChangeStart', function(event, next, current) {
-		console.log(AuthService);
+		console.log('------------$routeChangeStart------------');
 		if(_(routesThatRequireAuth).contains($location.path()) && AuthService.isLoggedIn !== true) {
 			//debugger;
 			$location.path('/login');

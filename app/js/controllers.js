@@ -24,9 +24,19 @@ angular.module('myApp.controllers', []).
     }]).
     controller('homeCtrl', ['$scope', 'AuthService', function($scope, AuthService) {
         if (AuthService.isLoggedIn) {
-            AuthService.loadUserInfo();
+            //AuthService.loadUserInfo();
             AuthService.checkSessionState();
-            AuthService.loadSpreadSheets();
+            AuthService.loadSpreadSheets().then(
+                function(data) {
+                    console.log('RC_Show returned: ');
+                    if (angular.isObject(data)) {
+                        console.log(data);
+                    }
+                },
+                function(data) {
+                    console.log('RC_Show retrieval failed: ' + data);
+                }
+            );
         }
     }]).
     controller('view1Ctrl', ['$scope', 'AuthService',
@@ -154,8 +164,22 @@ angular.module('myApp.controllers', []).
                 $("#logout").hide();
                 //debugger;
             }
-            AuthService.render();
-            //debugger;
-            console.log(AuthService.getToken()); //  == null , 因為callback未執行完畢
+            AuthService.render('#google_login', '#loader').then(
+                function(data) {
+                    console.log('AuthService returned: ' + data);
+                    $("#loader").hide();
+                    console.log('Token:' + AuthService.getToken());
+                },
+                function(data) {
+                    console.log('AuthService retrieval failed: ' + data);
+                    $("#loader").hide();
+                    $("#google_login").show();
+                }
+            ).then(function() {
+                AuthService.loadUserInfo().then(function(data) {
+                    console.log(data);
+                    console.log('AuthService.loadUserInfo() 執行完畢!');
+                });
+            });
         }
     ]);
