@@ -9,13 +9,6 @@
 
 /* Controllers */
 
-google.load('visualization', '1', {packages:['corechart','table']});
-
-google.setOnLoadCallback(function() {
-    //angular.bootstrap(document.body, ['myApp']);
-    //console.log('Angualar bootstrap complete');
-});
-
 angular.module('myApp.controllers', []).
     controller('indexCtrl', ['$scope', '$window', 'AuthService', 'sessionService',
         function($scope, $window, AuthService, sessionService){
