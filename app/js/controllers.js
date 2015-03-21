@@ -32,15 +32,17 @@ angular.module('myApp.controllers', []).
                 $scope.userInfo = data;
 
                 $scope.disconnectUser = function() {
-
+                    $('#loaderDiv').show();
                     var disconnectUser = AuthService.disconnectUser().then(function(resp) {
+                        $('#loaderDiv').hide();
                         alert("取消應用程式連結成功！, 將自動登出");
                         AuthService.logout();
                     }, function(error) {
+                        $('#loaderDiv').hide();
                         alert("取消應用程式連結失敗！請到 https://plus.google.com/apps 解除！");
                         window.open("https://plus.google.com/apps");
                     });
-                    httpInterceptor(disconnectUser); // 無效??
+                    //httpInterceptor(disconnectUser);
                 };
 
                 $('#profile').show();
@@ -48,6 +50,8 @@ angular.module('myApp.controllers', []).
 
                 sessionService.set('userInfo',JSON.stringify(data));
             });
+
+            httpInterceptor(loadUserInfo);
 
             AuthService.checkSessionState();
 
@@ -62,7 +66,6 @@ angular.module('myApp.controllers', []).
                     console.log('RC_Show fetch failed: ' + data);
                 }
             );
-            httpInterceptor(loadUserInfo);
         }
     }]).
     controller('view1Ctrl', ['$scope', 'AuthService',
