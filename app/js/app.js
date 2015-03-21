@@ -39,13 +39,17 @@ config(['$routeProvider',
 				redirectTo: '/login'
 			});
 }]).
-run(function($rootScope, $location, AuthService) {
+run(function($rootScope, $location, AuthService, sessionService) {
 	window.AuthService = AuthService;
+	window.sessionService = sessionService;
 	var routesThatRequireAuth = ['/home','/RC-Data-List','/login'];
 
 	$rootScope.$on('$routeChangeStart', function(event, next, current) {
 		console.log('------------$routeChangeStart------------');
-		if(_(routesThatRequireAuth).contains($location.path()) && AuthService.isLoggedIn !== true) {
+		var userInfo = sessionService.get('userInfo');
+		// TODO 利用 session ,免驗證
+		if(_(routesThatRequireAuth).contains($location.path()) &&
+			AuthService.isLoggedIn !== true) {
 			//debugger;
 			$location.path('/login');
 		} else {

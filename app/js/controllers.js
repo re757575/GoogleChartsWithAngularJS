@@ -17,12 +17,15 @@ google.setOnLoadCallback(function() {
 });
 
 angular.module('myApp.controllers', []).
-    controller('indexCtrl', ['$scope', '$window', 'AuthService', function($scope, $window, AuthService){
+    controller('indexCtrl', ['$scope', '$window', 'AuthService', 'sessionService',
+        function($scope, $window, AuthService, sessionService){
         $scope.logout = function() {
             AuthService.logout();
+            sessionService.remove('userInfo');
         }
     }]).
-    controller('homeCtrl', ['$scope', 'AuthService', function($scope, AuthService) {
+    controller('homeCtrl', ['$scope', 'AuthService', 'sessionService',
+        function($scope, AuthService, sessionService) {
         if (AuthService.isLoggedIn) {
 
             AuthService.loadUserInfo('plus').then(function(data) {
@@ -30,6 +33,8 @@ angular.module('myApp.controllers', []).
                 $scope.disconnectUser = AuthService.disconnectUser;
                 $('#profile').show();
                 console.log('AuthService.loadUserInfo() 執行完畢!');
+
+                sessionService.set('userInfo',JSON.stringify(data));
             });
 
             AuthService.checkSessionState();

@@ -8,8 +8,23 @@
 'use strict';
 
 angular.module('myApp.services', []).
-	factory('AuthService', ['$rootScope','$http', '$q', '$location', '$window',
-		function($rootScope, $http, $q, $location, $window) {
+	factory('sessionService', ['$rootScope', '$window',
+		function($rootScope, $window) {
+			return {
+				set: function(id, item) {
+					$window.sessionStorage.setItem(id, item);
+				},
+				get: function(id) {
+					return $window.sessionStorage.getItem(id);
+				},
+				remove: function(id) {
+					$window.sessionStorage.removeItem(id);
+				}
+			}
+		}
+	]).
+	factory('AuthService', ['$rootScope','$http', '$q', '$location', '$window', 'sessionService',
+		function($rootScope, $http, $q, $location, $window, sessionService) {
 
 		// Google Console 專案名稱: RC-JSON-Data
 		var service = {
