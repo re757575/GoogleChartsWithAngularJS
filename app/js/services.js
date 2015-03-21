@@ -29,6 +29,7 @@ angular.module('myApp.services', []).
 				token: null,
 				isLoggedIn: null,
 				session_state: null,
+				userInfo: null,
 
 				getToken: function() {
 				    return this.token;
@@ -142,6 +143,7 @@ angular.module('myApp.services', []).
 		        var request = gapi.client.oauth2.userinfo.get();
 		            request.execute(function(obj) {
 						console.log('AuthService.loadUserInfo callback 執行完畢!');
+						service.userInfo = obj;
 						def.resolve(obj);
 		            });
 		    });
@@ -159,8 +161,9 @@ angular.module('myApp.services', []).
 		        action +'&guid='+ guid.StarAccount +'&tables='+ tables[guid.User -1] +'&queryType='+queryType+'&token='+ service.token +'&callback=JSON_CALLBACK';
 
 			var def = $q.defer();
-		    $http.jsonp(url).success(function (data) {
-				//debugger;
+			console.log('AuthService.loadSpreadSheets() 開始執行!');
+		    $http.jsonp(url).success(function (data, status, headers, config, statusText) {
+
 		        if(data === undefined) {
 		            //console.error('非預期錯誤: 無法取得資料');
 		            def.reject('非預期錯誤: 無法取得資料');
@@ -189,7 +192,10 @@ angular.module('myApp.services', []).
 		                }
 		            }
 		        }
+		    }).error(function(data, status) {
+				def.reject(status);
 		    });
+
 			$("#loader").hide();
 		    return def.promise;
 		}
