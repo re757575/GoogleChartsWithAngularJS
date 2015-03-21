@@ -24,13 +24,25 @@ angular.module('myApp.controllers', []).
             sessionService.remove('userInfo');
         }
     }]).
-    controller('homeCtrl', ['$scope', 'AuthService', 'sessionService', 'httpInterceptor',
-        function($scope, AuthService, sessionService, httpInterceptor) {
+    controller('homeCtrl', ['$scope', '$q', 'AuthService', 'sessionService', 'httpInterceptor',
+        function($scope, $q, AuthService, sessionService, httpInterceptor) {
         if (AuthService.isLoggedIn) {
 
             var loadUserInfo = AuthService.loadUserInfo('plus').then(function(data) {
                 $scope.userInfo = data;
-                $scope.disconnectUser = AuthService.disconnectUser;
+
+                $scope.disconnectUser = function() {
+
+                    var disconnectUser = AuthService.disconnectUser().then(function(resp) {
+                        alert("取消應用程式連結成功！, 將自動登出");
+                        AuthService.logout();
+                    }, function(error) {
+                        alert("取消應用程式連結失敗！請到 https://plus.google.com/apps 解除！");
+                        window.open("https://plus.google.com/apps");
+                    });
+                    httpInterceptor(disconnectUser); // 無效??
+                };
+
                 $('#profile').show();
                 console.log('AuthService.loadUserInfo() 執行完畢!');
 

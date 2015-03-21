@@ -106,10 +106,12 @@ angular.module('myApp.services', []).
                 'scope': service.getScopeString()
             });
 			return def.promise;
-        };
+        }
 
 		function disconnectUser() {
 		    var revokeUrl = 'https://accounts.google.com/o/oauth2/revoke?token=' + service.token;
+		    var def = $q.defer();
+
 		    $.ajax({
 		        type: 'GET',
 		        url: revokeUrl,
@@ -117,15 +119,15 @@ angular.module('myApp.services', []).
 		        contentType: "application/json",
 		        dataType: 'jsonp',
 		        success: function(nullResponse) {
-		            alert("取消應用程式連結成功！, 將自動登出");
-		            service.logout();
+		            def.resolve('ok');
 		        },
-		        error: function(e) {
-		            alert("取消應用程式連結失敗！請到 https://plus.google.com/apps 解除！");
-		            window.open("https://plus.google.com/apps");
+		        error: function(error) {
+		            def.reject(error);
 		        }
 		    });
-		};
+
+			return def.promise;
+		}
 
 		function logout() {
 		    gapi.auth.signOut();
@@ -133,7 +135,7 @@ angular.module('myApp.services', []).
             service.token = null;
             $("#google_login").show();
 		    $window.location.href = '/';
-		};
+		}
 
 		function checkSessionState() {
 		    var sessionParams = {
