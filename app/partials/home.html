@@ -2,12 +2,12 @@
 	<li><a href="#/view1">view1</a></li>
 	<li><a href="#/RC-Data-List">rc</a></li>
 </ul>
-{{userInfo}}
 
-<div id="vip" style="font-size:14px;font-weight:blod;color:red;display:none;">
-    <img id="head" /><br />
-    邮箱：<span id="email">{{userInfo.email}}</span><br />
-    年龄：<span id="age">{{'not'}}</span><br />
-    姓名：<span id="name">{{userInfo.name}}</span><br />
+<div id="profile" style="font-size:14px;display:none;">
+    <img id="head" ng-src="{{userInfo.image.url}}&sz=200"/><br />
+    Email：<span id="email">{{userInfo.emails[0].value}}</span><br />
+    Age：<span id="age">{{userInfo.ageRange.min}}</span><br />
+    gender : <span id="gender">{{userInfo.gender}}</span><br />
+    Name：<span id="name">{{userInfo.displayName}}</span><br />
     <a href="javascript:;" ng-click="disconnectUser()">退出</a>
 </div>

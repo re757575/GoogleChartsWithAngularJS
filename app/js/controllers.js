@@ -25,23 +25,23 @@ angular.module('myApp.controllers', []).
     controller('homeCtrl', ['$scope', 'AuthService', function($scope, AuthService) {
         if (AuthService.isLoggedIn) {
 
-            AuthService.loadUserInfo().then(function(data) {
+            AuthService.loadUserInfo('plus').then(function(data) {
                 $scope.userInfo = data;
                 $scope.disconnectUser = AuthService.disconnectUser;
-                $('#vip').show();
+                $('#profile').show();
                 console.log('AuthService.loadUserInfo() 執行完畢!');
             });
 
             AuthService.checkSessionState();
             AuthService.loadSpreadSheets().then(
                 function(data) {
-                    console.log('RC_Show returned: ');
+                    console.log('RC_Show fetch returned: ');
                     if (angular.isObject(data)) {
                         console.log(data);
                     }
                 },
                 function(data) {
-                    console.log('RC_Show retrieval failed: ' + data);
+                    console.log('RC_Show fetch failed: ' + data);
                 }
             );
         }

@@ -135,17 +135,28 @@ angular.module('myApp.services', []).
 		    });
 		}
 
-		function loadUserInfo() {
+		function loadUserInfo(type) {
 			var def = $q.defer();
 			console.log('AuthService.loadUserInfo() 開始執行!');
-		    gapi.client.load('oauth2', 'v2', function() {
-		        var request = gapi.client.oauth2.userinfo.get();
-		            request.execute(function(obj) {
+			if (type !== undefined && type === 'plus') {
+				gapi.client.load('plus','v1',function(){
+				    var request=gapi.client.plus.people.get({'userId':'me'});
+				    request.execute(function(profile) {
 						console.log('AuthService.loadUserInfo callback 執行完畢!');
-						service.userInfo = obj;
-						def.resolve(obj);
-		            });
-		    });
+						service.userInfo = profile;
+						def.resolve(profile);
+				    });
+				});
+			} else {
+				gapi.client.load('oauth2', 'v2', function() {
+					var request = gapi.client.oauth2.userinfo.get();
+					request.execute(function(profile) {
+						console.log('AuthService.loadUserInfo callback 執行完畢!');
+						service.userInfo = profile;
+						def.resolve(profile);
+					});
+				});
+			}
 		    return def.promise;
 		}
 
