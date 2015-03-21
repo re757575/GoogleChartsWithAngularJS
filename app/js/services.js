@@ -226,3 +226,34 @@ angular.module('myApp.services', []).
 		}
 
 	}]);
+
+angular.module('myApp.sharedServices', [])
+    .config(function ($httpProvider) {
+        $httpProvider.interceptors.push('httpInterceptor');
+        var spinnerFunction = function (data, headersGetter) {
+            // todo start the spinner here
+            //alert('start spinner');
+            $('#loaderDiv').show();
+            return data;
+        };
+        $httpProvider.defaults.transformRequest.push(spinnerFunction);
+    })
+	// register the interceptor as a service, intercepts ALL angular ajax http calls
+    .factory('httpInterceptor', function ($q, $window) {
+        return function (promise) {
+            return promise.then(function (response) {
+                // do something on success
+                // todo hide the spinner
+                // alert('stop spinner');
+                $('#loaderDiv').hide();
+                return response;
+
+            }, function (response) {
+                // do something on error
+                // todo hide the spinner
+                // alert('stop spinner');
+                $('#loaderDiv').hide();
+                return $q.reject(response);
+            });
+        };
+    });

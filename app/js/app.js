@@ -11,7 +11,8 @@
 angular.module('myApp', [
 	'ngRoute',
 	'myApp.controllers',
-	'myApp.services'
+	'myApp.services',
+	'myApp.sharedServices'
 ]).
 config(['$routeProvider',
 	function($routeProvider) {
@@ -30,6 +31,7 @@ config(['$routeProvider',
 			}).
 			when('/RC-Data-List', {
 				templateUrl: '/partials/RC_Data_List.html',
+				controller: 'RC_Data_List_Ctrl'
 			}).
 			when('/RC_Data/:tab', {
 				templateUrl: '/partials/RC_Data.html',

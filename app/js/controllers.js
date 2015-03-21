@@ -24,11 +24,11 @@ angular.module('myApp.controllers', []).
             sessionService.remove('userInfo');
         }
     }]).
-    controller('homeCtrl', ['$scope', 'AuthService', 'sessionService',
-        function($scope, AuthService, sessionService) {
+    controller('homeCtrl', ['$scope', 'AuthService', 'sessionService', 'httpInterceptor',
+        function($scope, AuthService, sessionService, httpInterceptor) {
         if (AuthService.isLoggedIn) {
 
-            AuthService.loadUserInfo('plus').then(function(data) {
+            var loadUserInfo = AuthService.loadUserInfo('plus').then(function(data) {
                 $scope.userInfo = data;
                 $scope.disconnectUser = AuthService.disconnectUser;
                 $('#profile').show();
@@ -38,7 +38,8 @@ angular.module('myApp.controllers', []).
             });
 
             AuthService.checkSessionState();
-            AuthService.loadSpreadSheets().then(
+
+            var loadSpreadSheets = AuthService.loadSpreadSheets().then(
                 function(data) {
                     console.log('RC_Show fetch returned: ');
                     if (angular.isObject(data)) {
@@ -49,6 +50,7 @@ angular.module('myApp.controllers', []).
                     console.log('RC_Show fetch failed: ' + data);
                 }
             );
+            httpInterceptor(loadUserInfo);
         }
     }]).
     controller('view1Ctrl', ['$scope', 'AuthService',
@@ -69,10 +71,14 @@ angular.module('myApp.controllers', []).
             if (AuthService.isLoggedIn) {
                 $("#homeLink").show();
             }
+            $('#loaderDiv').hide();
         }
     ]).
-    controller('RC_Ctrl', ['$scope', '$routeParams', '$location', 'AuthService',
-        function($scope, $routeParams, $location, AuthService) {
+    controller('RC_Data_List_Ctrl', ['$scope', function($scope){
+        $('#loaderDiv').hide();
+    }]).
+    controller('RC_Ctrl', ['$scope', '$routeParams', '$location', '$q', 'AuthService', 'httpInterceptor',
+        function($scope, $routeParams, $location, $q, AuthService, httpInterceptor) {
 
             // TODO 因為有參數 所以 $routeChangeStart location.path 無法吻合, 需修增加判斷
             if (AuthService.getToken() == null) {
@@ -88,6 +94,7 @@ angular.module('myApp.controllers', []).
             var tablediv = document.getElementById("tablediv");
 
             (function (name) {
+                $('#loaderDiv').show();
                 if (name === undefined) {
                     name ='';
                 }
@@ -96,11 +103,13 @@ angular.module('myApp.controllers', []).
             })();
 
             $scope.change = function() {
+                $('#loaderDiv').show();
                 query.setQuery('select * where A LIKE "%'+ $scope.name +'%"');
                 query.send(handleQueryResponse);
             };
 
             function handleQueryResponse(resp) {
+                //debugger;
                 if (resp.isError()) {
                     console.error('無法取得資料');
                     handleErrorResponse(resp, tablediv);
@@ -110,23 +119,13 @@ angular.module('myApp.controllers', []).
                     table = new google.visualization.Table(tablediv);
                     table.draw(data);
 
-                    /*
-                    google.visualization.events.addListener(table, 'ready', readyHandler);
-                    google.visualization.events.addListener(table, 'error', errorHandler);
-                    */
                     google.visualization.events.addListener(table, 'select', selectHandler);
 
                     var jsonData = JSON.parse(data.toJSON());
                     var len = jsonData.rows.length;
 
                     console.log(jsonData);
-                    //debugger;;
-                    /*for (var i = 0; i < len; ++i) {
-                        var row = jsonData.rows[i];
-                        for (var j = 0; j < row.c.length; ++j) {
-                            //console.log(row.c[j].v);
-                        }
-                    }*/
+                    $('#loaderDiv').hide();
                 }
             }
 
@@ -187,8 +186,8 @@ angular.module('myApp.controllers', []).
                     $("#loader").hide();
                     $("#google_login").show();
                 }
-            ).then(function() {
+            ).then(function() {});
 
-            });
+            $('#loaderDiv').hide();
         }
     ]);
