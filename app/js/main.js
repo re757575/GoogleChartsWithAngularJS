@@ -16,6 +16,8 @@ requirejs.config({
         'requirejs-plugins': 'requirejs-plugins/lib/require',
         'angular': 'angular/angular.min',
         'angular-route': 'angular-route/angular-route.min',
+        'angular-sprintf': 'sprintf/dist/angular-sprintf.min',
+        'sprintf': 'sprintf/dist/sprintf.min',
         'app': '../js/app',
         'services': '../js/services',
         'controllers': '../js/controllers',
@@ -31,6 +33,8 @@ requirejs.config({
         'angular' : { exports: 'angular', eps: ['async'] },
         // 設定 angular 的其它模組依賴 angular 核心模組
         'angular-route': { deps: ['angular'] },
+        'sprintf': {},
+        'angular-sprintf': { deps: ['sprintf', 'angular'] },
         'app': { deps: ['angular','angular-route'] },
         'services': { deps: ['app'] },
         'controllers': { deps: ['app','services'] },
@@ -48,6 +52,8 @@ require(
 		'controllers',
 		'jquery',
 		'underscore',
+        'sprintf',
+        'angular-sprintf',
 	],
 	function(angular) {
 	    console.info(angular.version);

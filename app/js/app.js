@@ -12,7 +12,8 @@ angular.module('myApp', [
 	'ngRoute',
 	'myApp.controllers',
 	'myApp.services',
-	'myApp.sharedServices'
+	'myApp.sharedServices',
+	"sprintf"
 ]).
 config(['$routeProvider',
 	function($routeProvider) {
