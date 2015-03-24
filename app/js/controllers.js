@@ -28,15 +28,18 @@ angular.module('myApp.controllers', []).
                 console.log('AuthService.loadUserInfo() 執行完畢!');
 
                 $scope.disconnectUser = function() {
-                    $('#loaderDiv').show();
-                    var disconnectUser = AuthService.disconnectUser().then(function(resp) {
-                        $window.alert("取消應用程式連結成功！, 將自動登出");
-                        AuthService.logout();
-                    }, function(error) {
-                        $window.alert("取消應用程式連結失敗！請到 https://plus.google.com/apps 解除！");
-                        $window.open("https://plus.google.com/apps");
-                    });
-                    httpInterceptor(disconnectUser);
+                    var confirm = $window.confirm("您確定取消應用程式連結嗎? 這將會自動登出!");
+                    if (confirm) {
+                        $('#loaderDiv').show();
+                        var disconnectUser = AuthService.disconnectUser().then(function(resp) {
+                            $window.alert("取消應用程式連結成功！, 將自動登出");
+                            AuthService.logout();
+                        }, function(error) {
+                            $window.alert("取消應用程式連結失敗！請到 https://plus.google.com/apps 解除！");
+                            $window.open("https://plus.google.com/apps");
+                        });
+                        httpInterceptor(disconnectUser);
+                    }
                 };
 
                 sessionService.set('userInfo',JSON.stringify(data));
