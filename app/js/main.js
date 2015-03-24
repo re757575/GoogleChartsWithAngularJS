@@ -9,6 +9,7 @@
 requirejs.config({
     // 所有js的根目錄，相對於HTML
     baseUrl: 'bower_components',
+    waitSeconds: 7,
     paths: {
         // js的路径， 相對於 baseUrl
         'requirejs-plugins': 'requirejs-plugins/lib/require',
