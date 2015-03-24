@@ -1,9 +1,10 @@
 /**
  *
- * @authors Alex.Dai (re757575.github.io)
+ * @authors Alex.Dai (https://github.com/re757575)
  * @date    2015-03-21 23:01:30
  * @version 1.0
  */
+
 'use strict';
 
 requirejs.config({

@@ -1,6 +1,6 @@
 /**
  *
- * @authors Alex.Dai (re757575.github.io)
+ * @authors Alex.Dai (https://github.com/re757575)
  * @date    2015-03-10 15:32:15
  * @version 1.0
  */
