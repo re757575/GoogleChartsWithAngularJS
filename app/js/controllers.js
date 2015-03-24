@@ -157,7 +157,7 @@ angular.module('myApp.controllers', []).
                                     starname = entry.gsx$starname.$t,
                                     sendto = entry.gsx$sendto.$t,
                                     lastsenddate = entry.gsx$lastsenddate.$t,
-                                    lastsenddatetime = entry.gsx$lastsenddatetime.$t;
+                                    lastsenddatetime = parseInt(entry.gsx$lastsenddatetime.$t,10);
                                 obj.push({
                                     'staruid': staruid, 'starname': starname,
                                     'sendto': sendto, 'lastsenddate': lastsenddate,

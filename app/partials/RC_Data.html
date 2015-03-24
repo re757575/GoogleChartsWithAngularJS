@@ -62,7 +62,7 @@
 					<td>{{v.staruid}}</td>
 					<td>{{v.starname}}</td>
 					<td>{{v.lastsenddate}}</td>
-					<td>{{v.lastsenddatetime}}</td>
+					<td>{{v.lastsenddatetime | moment:'YYYY-MM-DD HH:mm:ss'}}</td>
 					<td>{{v.sendto}}</td>
 				</tr>
 				<tr ng-if="RC_Data.length == 0">

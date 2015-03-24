@@ -26,7 +26,8 @@ requirejs.config({
         'underscore': 'underscore/underscore-min',
         'async' : 'requirejs-plugins/src/async', //alias to plugin
         'propertyParser': 'requirejs-plugins/src/propertyParser',
-        'goog': 'requirejs-plugins/src/goog'
+        'goog': 'requirejs-plugins/src/goog',
+        'moment': 'moment/min/moment.min'
     },
     shim: {
 		'async': {},
@@ -42,6 +43,7 @@ requirejs.config({
         'controllers': { deps: ['app','services', 'filters'] },
         'propertyParser': { deps: ['async'] },
         'goog': { deps: ['async','propertyParser'] },
+        'moment': {}
     }
 });
 
@@ -58,6 +60,7 @@ require(
 		'underscore',
         'sprintf',
         'angular-sprintf',
+        'moment'
 	],
 	function(angular) {
 	    console.info(angular.version);

@@ -25,4 +25,9 @@ angular.module('myApp.filters', []).
 			  items.slice().reverse() : // If it is an array, split and reverse it
 			  (items + '').split('').reverse().join(''); // else make it a string (if it isn't already), and reverse it
 		};
+	}).
+	filter('moment', function() {
+	    return function(dateString, format) {
+	        return moment(dateString).format(format);
+	    };
 	});
