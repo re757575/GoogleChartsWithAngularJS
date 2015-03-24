@@ -17,38 +17,53 @@ angular.module('myApp.controllers', []).
             sessionService.remove('userInfo');
         }
     }]).
-    controller('homeCtrl', ['$scope', '$q', 'AuthService', 'sessionService', 'httpInterceptor', 'spreadSheetsService',
-        function($scope, $q, AuthService, sessionService, httpInterceptor, spreadSheetsService) {
+    controller('homeCtrl', ['$scope', '$q', '$window', 'AuthService', 'sessionService', 'httpInterceptor', 'spreadSheetsService',
+        function($scope, $q, $window, AuthService, sessionService, httpInterceptor, spreadSheetsService) {
         if (AuthService.isLoggedIn) {
 
             var loadUserInfo = AuthService.loadUserInfo('plus').then(function(data) {
+
                 $scope.userInfo = data;
+                $('#profile').show();
+                console.log('AuthService.loadUserInfo() 執行完畢!');
 
                 $scope.disconnectUser = function() {
                     $('#loaderDiv').show();
                     var disconnectUser = AuthService.disconnectUser().then(function(resp) {
-                        $('#loaderDiv').hide();
-                        alert("取消應用程式連結成功！, 將自動登出");
+                        $window.alert("取消應用程式連結成功！, 將自動登出");
                         AuthService.logout();
                     }, function(error) {
-                        $('#loaderDiv').hide();
-                        alert("取消應用程式連結失敗！請到 https://plus.google.com/apps 解除！");
-                        window.open("https://plus.google.com/apps");
+                        $window.alert("取消應用程式連結失敗！請到 https://plus.google.com/apps 解除！");
+                        $window.open("https://plus.google.com/apps");
                     });
-                    //httpInterceptor(disconnectUser);
+                    httpInterceptor(disconnectUser);
                 };
-
-                $('#profile').show();
-                console.log('AuthService.loadUserInfo() 執行完畢!');
 
                 sessionService.set('userInfo',JSON.stringify(data));
             });
 
             loadUserInfo.then(function() {
                 httpInterceptor(loadSpreadSheets());
+                // httpInterceptor(bindDisconnectUser());
             });
 
             AuthService.checkSessionState();
+
+            // function bindDisconnectUser() {
+            //     var disconnectUser;
+            //     $scope.disconnectUser = function() {
+            //         $('#loaderDiv').show();
+            //         disconnectUser = AuthService.disconnectUser().then(function(resp) {
+            //             alert("取消應用程式連結成功！, 將自動登出");
+            //             AuthService.logout();
+            //         }, function(error) {
+            //             alert("取消應用程式連結失敗！請到 https://plus.google.com/apps 解除！");
+            //             window.open("https://plus.google.com/apps");
+            //         });
+            //         return disconnectUser;
+            //     };
+            //     return disconnectUser;
+            // }
 
             function loadSpreadSheets() {
                 var guid = spreadSheetsService.guid.onLineLog;
