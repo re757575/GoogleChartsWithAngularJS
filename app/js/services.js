@@ -39,8 +39,8 @@ angular.module('myApp.services', []).
 			var def = $q.defer();
 			console.log('spreadSheetsService.loadData() 開始執行!');
 
-			var url = service.url + '?action=' + service.action + '&guid=' + guid + '&queryType=' +
-					  service.queryType + '&token=' + AuthService.token + '&callback=JSON_CALLBACK';
+			var url = 'https://script.google.com/macros/s/AKfycbyMCXoJJhtZWctoHxX9Ptv3f_aEi_P2pa9qZ4g7gYOqEssAqEw/exec?action=%s&guid=%s&queryType=%s&token=%s&callback=JSON_CALLBACK';
+			url = sprintf(url, 'query', guid, service.queryType, AuthService.token);
 
 			$http.jsonp(url).success(function (data, status, headers, config, statusText) {
 
