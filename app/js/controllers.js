@@ -17,8 +17,8 @@ angular.module('myApp.controllers', []).
             sessionService.remove('userInfo');
         }
     }]).
-    controller('homeCtrl', ['$scope', '$q', 'AuthService', 'sessionService', 'httpInterceptor',
-        function($scope, $q, AuthService, sessionService, httpInterceptor) {
+    controller('homeCtrl', ['$scope', '$q', 'AuthService', 'sessionService', 'httpInterceptor', 'spreadSheetsService',
+        function($scope, $q, AuthService, sessionService, httpInterceptor, spreadSheetsService) {
         if (AuthService.isLoggedIn) {
 
             var loadUserInfo = AuthService.loadUserInfo('plus').then(function(data) {
@@ -44,21 +44,29 @@ angular.module('myApp.controllers', []).
                 sessionService.set('userInfo',JSON.stringify(data));
             });
 
-            httpInterceptor(loadUserInfo);
+            loadUserInfo.then(function() {
+                httpInterceptor(loadSpreadSheets());
+            });
 
             AuthService.checkSessionState();
 
-            var loadSpreadSheets = AuthService.loadSpreadSheets().then(
-                function(data) {
-                    console.log('RC_Show fetch returned: ');
-                    if (angular.isObject(data)) {
-                        console.log(data);
+            function loadSpreadSheets() {
+                var guid = spreadSheetsService.guid.onLineLog;
+                var ssService = spreadSheetsService.loadData(guid).then(
+                    function(data) {
+                        console.log('RC_Show fetch returned: ');
+                        if (angular.isObject(data)) {
+                            console.log(data);
+                            console.log('spreadSheetsService.loadData() 執行成功!');
+                        }
+                    },
+                    function(error) {
+                        console.log('RC_Show fetch failed: ' + error);
+                        console.log('spreadSheetsService.loadData() 執行失敗!');
                     }
-                },
-                function(data) {
-                    console.log('RC_Show fetch failed: ' + data);
-                }
-            );
+                );
+                return ssService;
+            }
         }
     }]).
     controller('view1Ctrl', ['$scope', 'AuthService',

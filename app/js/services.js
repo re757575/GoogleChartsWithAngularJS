@@ -23,6 +23,63 @@ angular.module('myApp.services', []).
 			}
 		}
 	]).
+	factory('spreadSheetsService', ['$http', '$q', 'AuthService', function($http, $q, AuthService) {
+
+		var service = {
+			url: 'https://script.google.com/macros/s/AKfycbyMCXoJJhtZWctoHxX9Ptv3f_aEi_P2pa9qZ4g7gYOqEssAqEw/exec',
+			guid: {'starAccount': 1, 'user': 2, 'sendEmailLog': 3, 'onLineLog': 4},
+			action: 'query',
+			queryType: 1,
+			loadData: loadData
+		};
+
+		return service;
+
+		function loadData(guid) {
+			var def = $q.defer();
+			console.log('spreadSheetsService.loadData() 開始執行!');
+
+			var url = service.url + '?action=' + service.action + '&guid=' + guid + '&queryType=' +
+					  service.queryType + '&token=' + AuthService.token + '&callback=JSON_CALLBACK';
+
+			$http.jsonp(url).success(function (data, status, headers, config, statusText) {
+
+			    if(data === undefined) {
+			        //console.error('非預期錯誤: 無法取得資料');
+			        def.reject('非預期錯誤: 無法取得資料');
+			    }
+			    if(data.error) {
+					//console.error(decodeURI(data.error.message));
+					def.reject(decodeURI(data.error.message));
+			    } else {
+			        if(!data) {
+			            //console.error('非預期錯誤: 無法取得資料');
+			            def.reject('非預期錯誤: 無法取得資料');
+			        } else {
+			            if (service.action == 'query') {
+			                if (service.queryType == 1) {
+			                    //console.info(data);
+			                    def.resolve(data);
+			                    //$scope.data = data.feed.entry;
+			                } else {
+			                    //console.info(data);
+			                    def.resolve(data);
+			                    //$scope.data = data.table.rows;
+			                }
+			            } else if (service.action == 'register') {
+			                //console.info(data.result);
+			                def.resolve(data.result);
+			            }
+			        }
+			    }
+			}).error(function(data, status) {
+				def.reject(status);
+			});
+
+			return def.promise;
+		}
+
+	}]).
 	factory('AuthService', ['$rootScope','$http', '$q', '$location', '$window', 'sessionService',
 		function($rootScope, $http, $q, $location, $window, sessionService) {
 
@@ -69,7 +126,6 @@ angular.module('myApp.services', []).
 				logout: logout,
 				loadUserInfo: loadUserInfo,
 				checkSessionState: checkSessionState,
-				loadSpreadSheets: loadSpreadSheets,
 				disconnectUser: disconnectUser
 		};
 
@@ -174,56 +230,6 @@ angular.module('myApp.services', []).
 					});
 				});
 			}
-		    return def.promise;
-		}
-
-		function loadSpreadSheets() {
-
-		    var action = 'query'; // register 、 query
-		    var queryType = 2; // only action = query
-		    var guid = {'StarAccount': 1, 'User': 2, 'SendEmailLog': 3, 'OnLineLog': 4};
-		    var tables = ['StarAccount', 'User', 'SendEmailLog', 'OnLineLog'];
-		    // RC_Show gas api
-		    var url = 'https://script.google.com/macros/s/AKfycbyMCXoJJhtZWctoHxX9Ptv3f_aEi_P2pa9qZ4g7gYOqEssAqEw/exec?action='+
-		        action +'&guid='+ guid.StarAccount +'&tables='+ tables[guid.User -1] +'&queryType='+queryType+'&token='+ service.token +'&callback=JSON_CALLBACK';
-
-			var def = $q.defer();
-			console.log('AuthService.loadSpreadSheets() 開始執行!');
-		    $http.jsonp(url).success(function (data, status, headers, config, statusText) {
-
-		        if(data === undefined) {
-		            //console.error('非預期錯誤: 無法取得資料');
-		            def.reject('非預期錯誤: 無法取得資料');
-		        }
-		        if(data.error) {
-					//console.error(decodeURI(data.error.message));
-					def.reject(decodeURI(data.error.message));
-		        } else {
-		            if(!data) {
-		                //console.error('非預期錯誤: 無法取得資料');
-		                def.reject('非預期錯誤: 無法取得資料');
-		            } else {
-		                if (action == 'query') {
-		                    if (queryType == 1) {
-		                        //console.info(data);
-		                        def.resolve(data);
-		                        //$scope.data = data.feed.entry;
-		                    } else {
-		                        //console.info(data);
-		                        def.resolve(data);
-		                        //$scope.data = data.table.rows;
-		                    }
-		                } else if (action == 'register') {
-		                    //console.info(data.result);
-		                    def.resolve(data.result);
-		                }
-		            }
-		        }
-		    }).error(function(data, status) {
-				def.reject(status);
-		    });
-
-			$("#loader").hide();
 		    return def.promise;
 		}
 
