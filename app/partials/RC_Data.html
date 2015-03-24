@@ -1,4 +1,104 @@
 <a href="/#/home">home</a>
 <p>This is the partial for RC_Data</p>
-<input type="text" ng-model="name" ng-change="change()">
-<div id="tablediv"></div>
+<h1>{{tab}}</h1>
+
+<input type="text" ng-model="searchText">
+
+<div ng-switch on="tab">
+	<div ng-switch-when="starAccount">
+		<table>
+			<thead>
+				<tr>
+					<th>uid</th>
+					<th>name</th>
+					<th>account</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-if="RC_Data.length > 0" ng-repeat="(k, v) in RC_Data | filter:searchText">
+					<td>{{v.uid}}</td>
+					<td>{{v.name}}</td>
+					<td>{{v.account}}</td>
+				<tr ng-if="RC_Data.length == 0">
+					<td>N/A</td>
+					<td>N/A</td>
+			</tbody>
+		</table>
+	</div>
+	<div ng-switch-when="user">
+		<table>
+			<thead>
+				<tr>
+					<th>email</th>
+					<th>favorites</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-if="RC_Data.length > 0" ng-repeat="(k, v) in RC_Data | filter:searchText">
+					<td>{{v.email}}</td>
+					<td>{{v.favorites}}</td>
+				</tr>
+				<tr ng-if="RC_Data.length == 0">
+					<td>N/A</td>
+					<td>N/A</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<div ng-switch-when="sendEmailLog">
+		<table>
+			<thead>
+				<tr>
+					<th>staruid</th>
+					<th>starname</th>
+					<th>lastsenddate</th>
+					<th>lastsenddatetime</th>
+					<th>sendto</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-if="RC_Data.length > 0" ng-repeat="(k, v) in RC_Data | filter:searchText">
+					<td>{{v.staruid}}</td>
+					<td>{{v.starname}}</td>
+					<td>{{v.lastsenddate}}</td>
+					<td>{{v.lastsenddatetime}}</td>
+					<td>{{v.sendto}}</td>
+				</tr>
+				<tr ng-if="RC_Data.length == 0">
+					<td>N/A</td>
+					<td>N/A</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<div ng-switch-when="onLineLog">
+		<table>
+			<thead>
+				<tr>
+					<th>staruid</th>
+					<th>starname</th>
+					<th>onlinedate</th>
+					<th>oninedatetime</th>
+					<th>lastonlinetime</th>
+					<th>onlinetimes</th>
+					<th>onlinetimetotalminute</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-if="RC_Data.length > 0" ng-repeat="(k, v) in RC_Data | filter:searchText">
+					<td>{{v.staruid}}</td>
+					<td>{{v.starname}}</td>
+					<td>{{v.onlinedate}}</td>
+					<td>{{v.oninedatetime}}</td>
+					<td>{{v.lastonlinetime}}</td>
+					<td>{{v.onlinetimes}}</td>
+					<td>{{v.onlinetimetotalminute}}</td>
+				</tr>
+				<tr ng-if="RC_Data.length == 0">
+					<td>N/A</td>
+					<td>N/A</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>

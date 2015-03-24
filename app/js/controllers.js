@@ -17,8 +17,8 @@ angular.module('myApp.controllers', []).
             sessionService.remove('userInfo');
         }
     }]).
-    controller('homeCtrl', ['$scope', '$q', '$window', 'AuthService', 'sessionService', 'httpInterceptor', 'spreadSheetsService',
-        function($scope, $q, $window, AuthService, sessionService, httpInterceptor, spreadSheetsService) {
+    controller('homeCtrl', ['$scope', '$q', '$window', 'AuthService', 'sessionService', 'httpInterceptor',
+        function($scope, $q, $window, AuthService, sessionService, httpInterceptor) {
         if (AuthService.isLoggedIn) {
 
             var loadUserInfo = AuthService.loadUserInfo('plus').then(function(data) {
@@ -46,9 +46,10 @@ angular.module('myApp.controllers', []).
             });
 
             loadUserInfo.then(function() {
-                httpInterceptor(loadSpreadSheets());
                 // httpInterceptor(bindDisconnectUser());
             });
+
+            httpInterceptor(loadUserInfo);
 
             AuthService.checkSessionState();
 
@@ -67,24 +68,6 @@ angular.module('myApp.controllers', []).
             //     };
             //     return disconnectUser;
             // }
-
-            function loadSpreadSheets() {
-                var guid = spreadSheetsService.guid.onLineLog;
-                var ssService = spreadSheetsService.loadData(guid).then(
-                    function(data) {
-                        console.log('RC_Show fetch returned: ');
-                        if (angular.isObject(data)) {
-                            console.log(data);
-                            console.log('spreadSheetsService.loadData() 執行成功!');
-                        }
-                    },
-                    function(error) {
-                        console.log('RC_Show fetch failed: ' + error);
-                        console.log('spreadSheetsService.loadData() 執行失敗!');
-                    }
-                );
-                return ssService;
-            }
         }
     }]).
     controller('view1Ctrl', ['$scope', 'AuthService',
@@ -111,93 +94,103 @@ angular.module('myApp.controllers', []).
     controller('RC_Data_List_Ctrl', ['$scope', function($scope){
         $('#loaderDiv').hide();
     }]).
-    controller('RC_Ctrl', ['$scope', '$routeParams', '$location', '$q', 'AuthService', 'httpInterceptor',
-        function($scope, $routeParams, $location, $q, AuthService, httpInterceptor) {
+    controller('RC_Ctrl', ['$scope', '$routeParams', '$location', '$q', 'AuthService', 'httpInterceptor', 'spreadSheetsService',
+        function($scope, $routeParams, $location, $q, AuthService, httpInterceptor, spreadSheetsService) {
 
             // TODO 因為有參數 所以 $routeChangeStart location.path 無法吻合, 需修增加判斷
             if (AuthService.getToken() == null) {
                 $location.path('/login');
             }
 
-            var tab = $routeParams.tab;
-            var tables = ['StarAccount', 'User', 'SendEmailLog', 'OnLineLog'];
-            var URL = 'https://docs.google.com/spreadsheets/d/13M4ACBGWNQ8-iG5qbwirJF9uTGhaiuvBXhbK34qjNoM/gviz/tq?sheet=' + tab;
-            var query = new google.visualization.Query(URL);
-            //runQuery();
-            var data,table;
-            var tablediv = document.getElementById("tablediv");
-
-            (function (name) {
-                $('#loaderDiv').show();
-                if (name === undefined) {
-                    name ='';
+            var tab = $scope.tab = $routeParams.tab;
+            var guid = spreadSheetsService.guid[tab];
+            if (guid === undefined) {
+                $location.path('/RC-Data-List');
+                $scope.$apply();
+            }
+            //debugger;
+            var ssService = spreadSheetsService.loadData(guid).then(
+                function(data) {
+                    console.log('RC_Show fetch returned: ');
+                    parseData(data);
+                },
+                function(error) {
+                    $scope.RC_Data = [];
+                    console.log('RC_Show fetch failed: ' + error);
+                    console.log('spreadSheetsService.loadData() 執行失敗!');
                 }
-                query.setQuery('select * where A LIKE "%'+ name +'%"');
-                query.send(handleQueryResponse);
-            })();
+            );
+            httpInterceptor(ssService);
 
-            $scope.change = function() {
-                $('#loaderDiv').show();
-                query.setQuery('select * where A LIKE "%'+ $scope.name +'%"');
-                query.send(handleQueryResponse);
-            };
+            function parseData(data) {
+                if (angular.isObject(data)) {
+                    // console.log(data.feed.updated);
+                    // console.log(data.feed.openSearch$totalResults);
+                    // console.log(data.feed.entry);
+                    var obj = [];
 
-            function handleQueryResponse(resp) {
-                //debugger;
-                if (resp.isError()) {
-                    console.error('無法取得資料');
-                    handleErrorResponse(resp, tablediv);
-                } else {
-
-                    data = resp.getDataTable();
-                    table = new google.visualization.Table(tablediv);
-                    table.draw(data);
-
-                    google.visualization.events.addListener(table, 'select', selectHandler);
-
-                    var jsonData = JSON.parse(data.toJSON());
-                    var len = jsonData.rows.length;
-
-                    console.log(jsonData);
-                    $('#loaderDiv').hide();
-                }
-            }
-
-            function handleErrorResponse(response, container) {
-                var message = response.getMessage();
-                var detailedMessage = response.getDetailedMessage();
-                google.visualization.errors.addError(container, response.getMessage(),
-                response.getDetailedMessage(), {'showInTooltip': true})
-            }
-
-            function readyHandler(e) {
-                console.log('table ready');
-            }
-
-            function errorHandler(e) {
-                alert('Error handler: ' + e.message);
-            }
-
-            function selectHandler() {
-                var selection = table.getSelection();
-                var message = '';
-                for (var i = 0; i < selection.length; i++) {
-                    var item = selection[i];
-                    if (item.row != null && item.column != null) {
-                        var str = data.getFormattedValue(item.row, item.column);
-                        message += '{row:' + item.row + ',column:' + item.column + '} = ' + str + '\n';
-                    } else if (item.row != null) {
-                        var str = data.getFormattedValue(item.row, 0);
-                        message += '{row:' + item.row + ', column:none}; value (col 0) = ' + str + '\n';
-                    } else if (item.column != null) {
-                        var str = data.getFormattedValue(0, item.column);
-                        message += '{row:none, column:' + item.column + '}; value (row 0) = ' + str + '\n';
+                    switch(tab) {
+                        case 'starAccount':
+                            for (var i in data.feed.entry) {
+                                // console.log(data.feed.entry[i]);
+                                var entry = data.feed.entry[i],
+                                    uid = entry.gsx$uid.$t,
+                                    name = entry.gsx$name.$t,
+                                    account = entry.gsx$account.$t;
+                                obj.push({'uid': uid, 'name': name, 'account': account});
+                            }
+                        break;
+                        case 'user':
+                            for (var i in data.feed.entry) {
+                                // console.log(data.feed.entry[i]);
+                                var entry = data.feed.entry[i],
+                                    email = entry.gsx$email.$t,
+                                    favorites = entry.gsx$favorites.$t;
+                                obj.push({'email': email, 'favorites': favorites});
+                            }
+                        break;
+                        case 'sendEmailLog':
+                            for (var i in data.feed.entry) {
+                                // console.log(data.feed.entry[i]);
+                                var entry = data.feed.entry[i],
+                                    staruid = entry.gsx$staruid.$t,
+                                    starname = entry.gsx$starname.$t,
+                                    sendto = entry.gsx$sendto.$t,
+                                    lastsenddate = entry.gsx$lastsenddate.$t,
+                                    lastsenddatetime = entry.gsx$lastsenddatetime.$t;
+                                obj.push({
+                                    'staruid': staruid, 'starname': starname,
+                                    'sendto': sendto, 'lastsenddate': lastsenddate,
+                                    'lastsenddatetime': lastsenddatetime
+                                });
+                            }
+                        break;
+                        case 'onLineLog':
+                            for (var i in data.feed.entry) {
+                                // console.log(data.feed.entry[i]);
+                                var entry = data.feed.entry[i],
+                                    staruid = entry.gsx$staruid.$t,
+                                    starname = entry.gsx$starname.$t,
+                                    onlinedate = entry.gsx$onlinedate.$t,
+                                    onlinedatetime = entry.gsx$onlinedatetime.$t,
+                                    lastonlinetime = entry.gsx$lastonlinetime.$t,
+                                    onlinetimes = entry.gsx$onlinetimes.$t,
+                                    onlinetimetotalminute = entry.gsx$onlinetimetotalminute.$t;
+                                obj.push({
+                                    'staruid': staruid, 'starname': starname,
+                                    'onlinedate': onlinedate, 'onlinedatetime': onlinedatetime,
+                                    'lastonlinetime': lastonlinetime, 'onlinetimes': onlinetimes,
+                                    'onlinetimetotalminute': onlinetimetotalminute
+                                });
+                            }
+                        break;
+                        default:
+                        break;
                     }
+
+                    $scope.RC_Data = obj;
+                    console.log('spreadSheetsService.loadData() 執行成功!');
                 }
-                if (message == '') {
-                    message = 'nothing';
-                }
-                alert('You selected ' + message);
             }
         }
     ]).
