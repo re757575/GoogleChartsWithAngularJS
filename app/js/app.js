@@ -13,6 +13,7 @@ angular.module('myApp', [
 	'myApp.controllers',
 	'myApp.services',
 	'myApp.sharedServices',
+	'myApp.filters',
 	"sprintf"
 ]).
 config(['$routeProvider',

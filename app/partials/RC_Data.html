@@ -57,7 +57,8 @@
 				</tr>
 			</thead>
 			<tbody>
-				<tr ng-if="RC_Data.length > 0" ng-repeat="(k, v) in RC_Data | filter:searchText">
+				<tr ng-if="RC_Data.length > 0" ng-repeat="(k, v) in RC_Data |
+					reverseArrayOnly | filter:searchText">
 					<td>{{v.staruid}}</td>
 					<td>{{v.starname}}</td>
 					<td>{{v.lastsenddate}}</td>
@@ -85,7 +86,8 @@
 				</tr>
 			</thead>
 			<tbody>
-				<tr ng-if="RC_Data.length > 0" ng-repeat="(k, v) in RC_Data | filter:searchText">
+				<tr ng-if="RC_Data.length > 0" ng-repeat="(k, v) in RC_Data |
+					reverseArrayOnly | filter:searchText">
 					<td>{{v.staruid}}</td>
 					<td>{{v.starname}}</td>
 					<td>{{v.onlinedate}}</td>
