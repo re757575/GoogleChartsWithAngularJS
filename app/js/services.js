@@ -217,7 +217,13 @@ angular.module('myApp.services', []).
 				    request.execute(function(profile) {
 						console.log('AuthService.loadUserInfo callback 執行完畢!');
 						service.userInfo = profile;
-						def.resolve(profile);
+
+						if (profile.error === undefined) {
+							def.resolve(profile);
+						} else {
+							def.reject({'code': profile.code, 'message': profile.message})
+						}
+
 				    });
 				});
 			} else {

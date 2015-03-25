@@ -21,6 +21,7 @@ angular.module('myApp.controllers', []).
         function($scope, $q, $window, AuthService, sessionService, httpInterceptor) {
         if (AuthService.isLoggedIn) {
 
+            $scope.alerts = [];
             var loadUserInfo = AuthService.loadUserInfo('plus').then(function(data) {
 
                 $scope.userInfo = data;
@@ -41,8 +42,13 @@ angular.module('myApp.controllers', []).
                         httpInterceptor(disconnectUser);
                     }
                 };
-
                 sessionService.set('userInfo',JSON.stringify(data));
+
+            }, function(error) {
+                $scope.alerts = [{
+                    type: 'danger',
+                    msg: "google+ 資料讀取失敗! 請重新登入。 錯誤訊息: " + error.message
+                }];
             });
 
             loadUserInfo.then(function() {
@@ -109,6 +115,7 @@ angular.module('myApp.controllers', []).
                 $scope.$apply();
             }
             //debugger;
+            $scope.alerts = [];
             var ssService = spreadSheetsService.loadData(guid).then(
                 function(data) {
                     console.log('RC_Show fetch returned: ');
@@ -116,6 +123,15 @@ angular.module('myApp.controllers', []).
                 },
                 function(error) {
                     $scope.RC_Data = [];
+                    $scope.alerts = [{
+                        type: 'danger',
+                        msg: '資料讀取失敗! 錯誤訊息: ' + error
+                    }];
+
+                    $scope.closeAlert = function(index) {
+                        $scope.alerts.splice(index, 1);
+                    };
+
                     console.log('RC_Show fetch failed: ' + error);
                     console.log('spreadSheetsService.loadData() 執行失敗!');
                 }
@@ -131,25 +147,28 @@ angular.module('myApp.controllers', []).
 
                     switch(tab) {
                         case 'starAccount':
+                            var count = 0;
                             for (var i in data.feed.entry) {
                                 // console.log(data.feed.entry[i]);
                                 var entry = data.feed.entry[i],
                                     uid = entry.gsx$uid.$t,
                                     name = entry.gsx$name.$t,
                                     account = entry.gsx$account.$t;
-                                obj.push({'uid': uid, 'name': name, 'account': account});
+                                obj.push({'count': ++count, 'uid': uid, 'name': name, 'account': account});
                             }
                         break;
                         case 'user':
+                            var count = 0;
                             for (var i in data.feed.entry) {
                                 // console.log(data.feed.entry[i]);
                                 var entry = data.feed.entry[i],
                                     email = entry.gsx$email.$t,
                                     favorites = entry.gsx$favorites.$t;
-                                obj.push({'email': email, 'favorites': favorites});
+                                obj.push({'count': ++count, 'email': email, 'favorites': favorites});
                             }
                         break;
                         case 'sendEmailLog':
+                            var count = 0;
                             for (var i in data.feed.entry) {
                                 // console.log(data.feed.entry[i]);
                                 var entry = data.feed.entry[i],
@@ -159,6 +178,7 @@ angular.module('myApp.controllers', []).
                                     lastsenddate = entry.gsx$lastsenddate.$t,
                                     lastsenddatetime = parseInt(entry.gsx$lastsenddatetime.$t,10);
                                 obj.push({
+                                    'count': ++count,
                                     'staruid': staruid, 'starname': starname,
                                     'sendto': sendto, 'lastsenddate': lastsenddate,
                                     'lastsenddatetime': lastsenddatetime
@@ -166,6 +186,7 @@ angular.module('myApp.controllers', []).
                             }
                         break;
                         case 'onLineLog':
+                            var count = 0;
                             for (var i in data.feed.entry) {
                                 // console.log(data.feed.entry[i]);
                                 var entry = data.feed.entry[i],
@@ -174,9 +195,10 @@ angular.module('myApp.controllers', []).
                                     onlinedate = entry.gsx$onlinedate.$t,
                                     onlinedatetime = entry.gsx$onlinedatetime.$t,
                                     lastonlinetime = entry.gsx$lastonlinetime.$t,
-                                    onlinetimes = entry.gsx$onlinetimes.$t,
-                                    onlinetimetotalminute = entry.gsx$onlinetimetotalminute.$t;
+                                    onlinetimes = parseInt(entry.gsx$onlinetimes.$t,10),
+                                    onlinetimetotalminute = parseInt(entry.gsx$onlinetimetotalminute.$t,10);
                                 obj.push({
+                                    'count': ++count,
                                     'staruid': staruid, 'starname': starname,
                                     'onlinedate': onlinedate, 'onlinedatetime': onlinedatetime,
                                     'lastonlinetime': lastonlinetime, 'onlinetimes': onlinetimes,

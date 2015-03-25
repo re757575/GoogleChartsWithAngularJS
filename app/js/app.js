@@ -17,6 +17,7 @@ angular.module('myApp', [
 	'sprintf',
 	'ui.bootstrap',
 	'smart-table',
+	'ui.bootstrap.alert',
 ]).
 config(['$routeProvider',
 	function($routeProvider) {

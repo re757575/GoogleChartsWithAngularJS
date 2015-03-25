@@ -3,6 +3,8 @@
 	<li><a href="#/RC-Data-List">rc</a></li>
 </ul>
 
+<alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)">{{alert.msg}}</alert>
+
 <div id="profile" style="font-size:14px;display:none;">
     <img id="head" ng-src="{{userInfo.image.url}}&sz=200"/><br />
     Email：<span id="email">{{userInfo.emails[0].value}}</span><br />
