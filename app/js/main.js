@@ -29,7 +29,8 @@ requirejs.config({
         'goog': 'requirejs-plugins/src/goog',
         'moment': 'moment/min/moment.min',
         'angular-bootstrap': 'angular-bootstrap/ui-bootstrap.min',
-        'angular-bootstrap-tpls': 'angular-bootstrap/ui-bootstrap-tpls.min'
+        'angular-bootstrap-tpls': 'angular-bootstrap/ui-bootstrap-tpls.min',
+        'angular-smart-table': 'angular-smart-table/dist/smart-table.min',
     },
     shim: {
 		'async': {},
@@ -46,8 +47,9 @@ requirejs.config({
         'propertyParser': { deps: ['async'] },
         'goog': { deps: ['async','propertyParser'] },
         'moment': {},
-        'angular-bootstrap':{ deps: ['angular', 'app'] },
-        'angular-bootstrap-tpls':{ deps: ['angular', 'app', 'angular-bootstrap'] },
+        'angular-bootstrap': { deps: ['angular', 'app'] },
+        'angular-bootstrap-tpls': { deps: ['angular', 'app', 'angular-bootstrap'] },
+        'angular-smart-table': { deps: ['angular', 'app'] },
     }
 });
 
@@ -67,6 +69,7 @@ require(
         'moment',
         'angular-bootstrap',
         'angular-bootstrap-tpls',
+        'angular-smart-table',
 	],
 	function(angular) {
 	    console.info(angular.version);

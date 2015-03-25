@@ -23,6 +23,7 @@
     "sprintf": "~1.0.2",
     "moment": "~2.9.0",
     "bootstrap": "~3.3.4",
-    "angular-bootstrap": "~0.12.1"
+    "angular-bootstrap": "~0.12.1",
+    "angular-smart-table": "~2.0.1"
   }
 }

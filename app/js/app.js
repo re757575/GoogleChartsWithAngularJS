@@ -16,6 +16,7 @@ angular.module('myApp', [
 	'myApp.filters',
 	'sprintf',
 	'ui.bootstrap',
+	'smart-table',
 ]).
 config(['$routeProvider',
 	function($routeProvider) {

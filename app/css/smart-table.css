@@ -1,0 +1,32 @@
+@charset "UTF-8";
+/**
+ *
+ * @authors Alex.Dai (https://github.com/re757575)
+ * @date    2015-03-25 14:34:13
+ * @version 1.0
+ */
+
+.st-sort-ascent:before{
+    content: '\25B2';
+}
+
+.st-sort-descent:before{
+    content: '\25BC';
+}
+
+.st-selected{
+    background: #216eff !important;
+    color: white !important;
+}
+
+.padding{
+    padding: 0.8em;
+}
+
+.th-text-align{
+	text-align: center;
+}
+
+.td-text-align{
+	text-align: center;
+}
