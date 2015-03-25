@@ -22,6 +22,7 @@
     "requirejs-plugins": "~1.0.3",
     "sprintf": "~1.0.2",
     "moment": "~2.9.0",
-    "bootstrap": "~3.3.4"
+    "bootstrap": "~3.3.4",
+    "angular-bootstrap": "~0.12.1"
   }
 }

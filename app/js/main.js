@@ -27,7 +27,9 @@ requirejs.config({
         'async' : 'requirejs-plugins/src/async', //alias to plugin
         'propertyParser': 'requirejs-plugins/src/propertyParser',
         'goog': 'requirejs-plugins/src/goog',
-        'moment': 'moment/min/moment.min'
+        'moment': 'moment/min/moment.min',
+        'angular-bootstrap': 'angular-bootstrap/ui-bootstrap.min',
+        'angular-bootstrap-tpls': 'angular-bootstrap/ui-bootstrap-tpls.min'
     },
     shim: {
 		'async': {},
@@ -43,7 +45,9 @@ requirejs.config({
         'controllers': { deps: ['app','services', 'filters'] },
         'propertyParser': { deps: ['async'] },
         'goog': { deps: ['async','propertyParser'] },
-        'moment': {}
+        'moment': {},
+        'angular-bootstrap':{ deps: ['angular', 'app'] },
+        'angular-bootstrap-tpls':{ deps: ['angular', 'app', 'angular-bootstrap'] },
     }
 });
 
@@ -60,7 +64,9 @@ require(
 		'underscore',
         'sprintf',
         'angular-sprintf',
-        'moment'
+        'moment',
+        'angular-bootstrap',
+        'angular-bootstrap-tpls',
 	],
 	function(angular) {
 	    console.info(angular.version);

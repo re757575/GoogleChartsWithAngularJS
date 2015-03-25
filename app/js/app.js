@@ -14,7 +14,8 @@ angular.module('myApp', [
 	'myApp.services',
 	'myApp.sharedServices',
 	'myApp.filters',
-	"sprintf"
+	'sprintf',
+	'ui.bootstrap',
 ]).
 config(['$routeProvider',
 	function($routeProvider) {
