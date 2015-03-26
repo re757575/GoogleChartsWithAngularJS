@@ -23,23 +23,23 @@ config(['$routeProvider',
 	function($routeProvider) {
 		$routeProvider.
 			when('/login', {
-				templateUrl: '/partials/login.html',
+				templateUrl: 'partials/login.html',
 				controller: 'LoginCtrl'
 			}).
 			when('/home', {
-				templateUrl: '/partials/home.html',
+				templateUrl: 'partials/home.html',
 				controller: 'homeCtrl'
 			}).
 			when('/view1', {
-				templateUrl: '/partials/view1.html',
+				templateUrl: 'partials/view1.html',
 				controller: 'view1Ctrl'
 			}).
 			when('/RC-Data-List', {
-				templateUrl: '/partials/RC_Data_List.html',
+				templateUrl: 'partials/RC_Data_List.html',
 				controller: 'RC_Data_List_Ctrl'
 			}).
 			when('/RC_Data/:tab', {
-				templateUrl: '/partials/RC_Data.html',
+				templateUrl: 'partials/RC_Data.html',
 				controller: 'RC_Ctrl'
 			}).
 			otherwise({

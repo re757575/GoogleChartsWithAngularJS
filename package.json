@@ -1,0 +1,32 @@
+{
+    "name": "GoogleChartsWithAngularJS",
+    "version": "0.1.0",
+    "dependencies": {
+        "body-parser": "^1.9.0",
+        "express": "~4.9.0",
+        "express-jwt": "~0.2.1",
+        "jsonwebtoken": "~0.4.0"
+    },
+    "description": "GoogleChartsWithAngularJS",
+    "main": "server.js",
+    "devDependencies": {},
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/re757575/GoogleChartsWithAngularJS.git"
+    },
+    "keywords": [
+        "angular",
+        "auth",
+        "jwt",
+        "express"
+    ],
+    "author": "",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/re757575/GoogleChartsWithAngularJS/issues"
+    },
+    "homepage": "https://github.com/re757575/GoogleChartsWithAngularJS"
+}
