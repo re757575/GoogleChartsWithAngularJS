@@ -46,6 +46,10 @@ config(['$routeProvider',
 				redirectTo: '/login'
 			});
 }]).
+config(['$httpProvider',
+	function($httpProvider) {
+	$httpProvider.interceptors.push('authInterceptor');
+}]).
 run(function($rootScope, $location, AuthService, sessionService) {
 	window.AuthService = AuthService;
 	window.sessionService = sessionService;

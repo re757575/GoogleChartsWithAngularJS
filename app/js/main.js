@@ -88,7 +88,7 @@ define(
 
 requirejs.onError = function (err) {
 	if (err.requireType === 'timeout') {
-	    alert("js載入錯誤: " + err);
+	    // alert("js載入錯誤: " + err);
 	}
 	else {
 		throw err;
