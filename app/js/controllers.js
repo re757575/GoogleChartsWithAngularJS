@@ -180,7 +180,9 @@ angular.module('myApp.controllers', []).
             }
             //debugger;
             $scope.alerts = [];
-            var ssService = spreadSheetsService.loadData(guid).then(
+            spreadSheetsService.guidSelect = guid;
+            spreadSheetsService.action = 'query';
+            var ssService = spreadSheetsService.loadData().then(
                 function(data) {
                     console.log('RC_Show fetch returned: ');
                     parseData(data);

@@ -28,19 +28,20 @@ angular.module('myApp.services', []).
 		var service = {
 			url: 'https://script.google.com/macros/s/AKfycbyMCXoJJhtZWctoHxX9Ptv3f_aEi_P2pa9qZ4g7gYOqEssAqEw/exec',
 			guid: {'starAccount': 1, 'user': 2, 'sendEmailLog': 3, 'onLineLog': 4},
-			action: 'query',
+			action: '', // ['query', 'register', 'checkEmail'],
+			guidSelect: '',
 			queryType: 1,
 			loadData: loadData
 		};
 
 		return service;
 
-		function loadData(guid) {
+		function loadData() {
 			var def = $q.defer();
 			console.log('spreadSheetsService.loadData() 開始執行!');
 
 			var url = 'https://script.google.com/macros/s/AKfycbyMCXoJJhtZWctoHxX9Ptv3f_aEi_P2pa9qZ4g7gYOqEssAqEw/exec?action=%s&guid=%s&queryType=%s&token=%s&callback=JSON_CALLBACK';
-			url = sprintf(url, 'query', guid, service.queryType, AuthService.token);
+			url = sprintf(url, service.action, service.guidSelect, service.queryType, AuthService.token);
 
 			$http.jsonp(url).success(function (data, status, headers, config, statusText) {
 
@@ -69,6 +70,8 @@ angular.module('myApp.services', []).
 			            } else if (service.action == 'register') {
 			                //console.info(data.result);
 			                def.resolve(data.result);
+			            } else {
+							def.resolve(data.result);
 			            }
 			        }
 			    }
