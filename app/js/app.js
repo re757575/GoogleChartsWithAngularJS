@@ -19,8 +19,8 @@ angular.module('myApp', [
 	'smart-table',
 	'ui.bootstrap.alert',
 ]).
-config(['$routeProvider',
-	function($routeProvider) {
+config(['$routeProvider', '$locationProvider',
+	function($routeProvider, $locationProvider) {
 		$routeProvider.
 			when('/login', {
 				templateUrl: 'partials/login.html',
@@ -45,6 +45,8 @@ config(['$routeProvider',
 			otherwise({
 				redirectTo: '/login'
 			});
+
+		$locationProvider.html5Mode(true);
 }]).
 config(['$httpProvider',
 	function($httpProvider) {

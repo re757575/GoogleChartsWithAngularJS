@@ -1,4 +1,6 @@
 var express = require('express');
+var path = require('path');
+var routes = require('./routes');
 var bodyParser = require('body-parser');
 
 var jwt = require('jsonwebtoken'); //https://npmjs.org/package/node-jsonwebtoken
@@ -16,13 +18,16 @@ app.use('/api', expressJwt({
 }));
 
 app.use(bodyParser.json());
-app.use('/', express.static(__dirname + '/'));
+
+app.use('/', express.static(path.join(__dirname, 'app')));
 
 app.use(function(err, req, res, next) {
     if (err.constructor.name === 'UnauthorizedError') {
         res.status(401).send('Unauthorized');
     }
 });
+
+app.get('/partials/:filename', routes.partials);
 
 app.post('/authenticate', function(req, res) {
     //TODO validate req.body.username and req.body.password

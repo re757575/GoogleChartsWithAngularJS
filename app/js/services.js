@@ -190,7 +190,7 @@ angular.module('myApp.services', []).
             service.isLoggedIn = false;
             service.token = null;
             $("#google_login").show();
-		    $window.location.href = '/app/';
+		    $window.location.href = '/';
 		    // $location.url('/login');
 		    // $window.location.href = '/app/#/login';
 		}
