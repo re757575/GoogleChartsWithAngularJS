@@ -41,6 +41,7 @@ angular.module('myApp.services', []).
 			console.log('spreadSheetsService.loadData() 開始執行!');
 
 			var url = 'https://script.google.com/macros/s/AKfycbyMCXoJJhtZWctoHxX9Ptv3f_aEi_P2pa9qZ4g7gYOqEssAqEw/exec?action=%s&guid=%s&queryType=%s&token=%s&callback=JSON_CALLBACK';
+
 			url = sprintf(url, service.action, service.guidSelect, service.queryType, AuthService.token);
 
 			$http.jsonp(url).success(function (data, status, headers, config, statusText) {

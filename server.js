@@ -32,7 +32,7 @@ app.get('/partials/:filename', routes.partials);
 app.post('/authenticate', function(req, res) {
     //TODO validate req.body.username and req.body.password
     //if is invalid, return 401
-    if (!(req.body.username === 'john.doe' && req.body.password === 'foobar')) {
+    if (!(req.body.email === 're757575@gmail.com' && req.body.password === 'foobar')) {
         res.status(401).send('Wrong user or password');
         return;
     }
